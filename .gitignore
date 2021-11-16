@@ -1,3 +1,7 @@
+# Output protocols
+dna_cleaning_output.py
+qpcr_output.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
