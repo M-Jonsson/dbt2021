@@ -18,7 +18,7 @@ Based on instructions from https://towardsdatascience.com/simple-github-integrat
 4. In the Git Bash terminal enter:
 ```
 git config user.name <your GitHub username>
-git config user.email <the email address of you GitHub account>
+git config user.email <the email address of your GitHub account>
 ```
 
 ## Using GitHub with VSCode
