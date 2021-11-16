@@ -26,3 +26,4 @@ A modified file will have a "M" symbol to show that the edits are only done on t
 2. The relevant file can be opened to compare changes.
 3. If happy with the changes, select "stage changes" (plus symbol beside the file name). Staging is mid-step in updating the GitHub files in case several files have been edited locally but only some should be uploaded.
 4. When all files that should be uploaded have been staged, enter a messege to describe the changes and press the Commit button (check mark) at the top of the source control pane.
+5. Finally, sync changes to update the GitHub files with the commit. 
