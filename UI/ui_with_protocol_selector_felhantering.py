@@ -1,0 +1,557 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+from tkinter import filedialog
+from tkinter.constants import NORMAL
+import replace_values
+import replace_values_qpcr
+import subprocess
+from os import getlogin
+import os.path
+import sys
+import time
+import multiprocessing
+
+# Files and logins for SSH and SCP
+local_user = getlogin() # os.getlogin() get username on local machine
+key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
+protocol_local_filepath = f'c:\\users\\{local_user}\\Onedrive\\Dokument\\python\\dbt2021\\dna_cleaning\\final\\'
+protocol_robot_filepath = '/data/user_storage/'
+protocol_name = 'dna_cleaning_output.py'
+ip = '169.254.29.201'
+username = 'root'
+protocol_qpcr_local_filepath = f'c:\\users\\{local_user}\\Onedrive\\Dokument\\python\\dbt2021\\qpcr\\'
+protocol_qpcr_name = 'qpcr_output.py'
+
+# Error check to see that the ssh_key is exists.
+if os.path.isfile(key_filename):
+    print("ssh-key read successfully.")
+# else:
+#     messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
+    # sys.exit(0)
+
+class Selector():
+    ''' Contains a frame with widgets used to select which protocol to edit.
+    The frame will be added to the root window when initialized and destroyed (closed)
+    when another class containing a new frame is called. 
+    '''
+
+    def __init__(self):
+        # Main frame for the protocol selection, to which all associated widgets are added
+        self.frame = tk.Frame()
+        self.frame.grid()
+
+        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol')
+        self.label_selection_info.grid(row=0, column=0, padx=10, pady=10)
+
+        self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads)
+        self.button_beads.grid(row=1, column=0, padx=10, pady=10)
+
+        self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr)
+        self.button_qpcr.grid(row=1, column=1, padx=10, pady=10)
+
+        self.button_test = ttk.Button(self.frame, text='test', command=self.test)
+        self.button_test.grid(row=1, column=2)
+
+    def select_protocol_beads(self):
+        '''Closes the frame for protocol selection, but not the root window.
+        Then creates a new frame from Bead_protocol_config() for editing a magnetic bead DNA purification protocol.
+        '''
+
+        self.frame.destroy()
+        Bead_protocol_config()
+
+    def select_protocol_qpcr(self):
+        '''Closes the frame for protocol selection, but not the root window.
+        Then creates a new frame from qPCR_protocol_config() for editing a qPCR protocol.
+        '''
+
+        self.frame.destroy()
+        qPCR_protocol_config()
+
+    def test(self):
+        # Check_window()
+        subprocess.run(f'scp -i {key_filename} dbt2021\\dna_cleaning\\final\\purify_less_than_8_custom.py {username}@{ip}:{protocol_robot_filepath}purify_less_than_8_custom.py')
+
+        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}purify_less_than_8_custom.py\'')
+
+
+class Bead_protocol_config():
+    '''Contains a frame with widgets used configure a magnetic bead DNA purification protocol.
+    The frame will be added to the root window when initialized and destroyed (closed)
+    when another class containing a new frame is called.
+    Allows for uploading and launching the finished protocol. 
+    '''
+
+    def __init__(self):
+        # Main frame for the protocol editing, to which all associated widgets are added
+        self.frame = tk.Frame()
+        self.frame.grid()
+
+        # Labels
+        self.label_sample_no = ttk.Label(self.frame, text='How many samples:')
+        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample:')
+        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio:')
+        self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes:')
+        self.label_eb = ttk.Label(self.frame, text='Volume EB:')
+
+        self.label_sample_no.grid(row=0, column=0, padx= 10, pady= 10, sticky=tk.W)
+        self.label_sample_vol.grid(row=2, column=0, padx= 10, pady= 10, stick=tk.W)
+        self.label_bead_ratio.grid(row=4, column=0, padx= 10, pady= 10, sticky=tk.W)
+        self.label_ethanol.grid(row=6, column=0, padx= 10, pady= 10, sticky=tk.W)
+        self.label_eb.grid(row=8, column=0, padx= 10, pady= 10, sticky=tk.W)
+
+        # Text entries
+        self.entry_sample_no = ttk.Entry(self.frame, width=35)
+        self.entry_sample_vol = ttk.Entry(self.frame, width=35)
+        self.entry_bead_ratio = ttk.Entry(self.frame, width=35)
+        self.entry_eb = ttk.Entry(self.frame, width=35)
+
+        self.entry_sample_no.grid(row= 0, column= 1, padx= 10, pady= 10, columnspan= 2)
+        self.entry_sample_vol.grid(row=2, column=1, padx=10, pady=10, columnspan= 2)
+        self.entry_bead_ratio.grid(row= 4, column= 1, padx= 10, pady= 10, columnspan= 2)
+        self.entry_eb.grid(row= 8, column= 1, padx= 10, pady= 10, columnspan= 2)
+
+        # Radio button for no. of ethanol washes
+        self.ethanol_var = tk.IntVar() # Variable associated with the radio buttons, changes depending on button state
+        self.radio_ethanol1 = tk.Radiobutton(self.frame, text='1', variable=self.ethanol_var, value=1)
+        self.radio_ethanol2 = tk.Radiobutton(self.frame, text='2', variable=self.ethanol_var ,value=2)
+
+        self.radio_ethanol1.grid(row=6, column=1, padx=10, pady=10)
+        self.radio_ethanol2.grid(row=6, column=2,  padx=10, pady=10)
+
+        # Buttons
+        self.button_ok = ttk.Button(self.frame, text='Ok', command=self.ok_button)
+        self.button_ok.grid(row=10, column=0, padx=10, pady=10)
+
+        self.button_exit = ttk.Button(self.frame, text='Exit', command=self.exit_button)
+        self.button_exit.grid(row=10, column=1, padx=10, pady=10)
+
+        self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button)
+        self.button_back.grid(row=10, column=2, padx=10, pady=10)
+
+        self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run, state=tk.DISABLED)
+        self.button_start.grid(row=15, column=0, padx=10, pady=10)
+
+        self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
+        self.button_estimate.grid(row=15, column=1, padx=10, pady=10)
+ 
+    def ok_button(self):
+        ''' Checks if all entries are valid.
+        If valid, will create a modified protocol with the value given by the user 
+        (done by replace_values() to edit an existing protocol blueprint).
+        Finally uploads the new protocol to the robot and launches it.
+        '''
+
+        try:
+        # Gets values from corresponding entry and checks if it is within the allowed range
+        # Keeps track of validity with a Bool for each entry. 
+            self.sample_no = int(self.entry_sample_no.get())
+            if self.sample_no < 1 or self.sample_no > 97:
+                messagebox.showerror('Notice', 'Sample amount is too small or too high, choose 1-96 samples')
+                self.correct_sample_no = False
+            else:
+                self.correct_sample_no = True
+            
+            self.sample_vol = float(self.entry_sample_vol.get())
+            if self.sample_vol <= 14.5 or self.sample_vol > 40:
+                messagebox.showerror('Notice', 'Volume amount is too low or too high, choose a volume between 15-40µl')
+                self.correct_sample_vol = False
+            else:
+                self.correct_sample_vol = True
+
+            self.ratio = float(self.entry_bead_ratio.get())
+            if self.ratio < 0.5 or self.ratio > 1.5:
+                messagebox.showerror('Notice', 'Ratio is too low or too high, choose a ratio between 0.5 and 1.5')
+                self.correct_ratio = False
+            else:
+                self.correct_ratio = True
+
+            self.ethanol = self.ethanol_var.get()
+            if self.ethanol == 1 or self.ethanol == 2:
+                self.correct_wash = True
+            else:
+                messagebox.showerror('Notice', 'Choose amount of washes')
+                self.correct_wash = False 
+
+            self.eb = float(self.entry_eb.get())
+            if self.eb < 15 or self.eb > 25:
+                messagebox.showerror('Notice', 'EB volume is too low or too high, choose an EB volume between 15-25µl')
+                self.correct_eb = False
+            else:
+                self.correct_eb = True
+            
+            if self.correct_sample_no and self.correct_sample_vol and self.correct_ratio and self.correct_wash and self.correct_eb:
+                # replace_values() edits an existing blueprint with the user inputs
+                try:
+                    replace_values.replace_values(self.sample_no, self.sample_vol, self.ratio, self.ethanol, self.eb) 
+                except IOError:
+                    tk.messagebox.showerror('Protocol write error!', 'Could not write protocol file. Please check that the template file exists and is accessible.'\
+                                            ' Contact your administrator if you are uncertain.')
+                else:
+                    # Calculate total amount of magnetic beads required. 
+                    self.total_beads = (self.sample_no * self.sample_vol * self.ratio) / 8
+                    print(self.total_beads)
+                    messagebox.showinfo('Success!', 'Successfully entered parameters into the protocol')
+
+                    # Allow starting or simulating the now created protocol
+                    self.button_estimate.config(state=tk.NORMAL)
+                    self.button_start.config(state=tk.NORMAL)
+
+                    # Disable editing values since a protocol has been created
+                    self.entry_bead_ratio.config(state=tk.DISABLED)
+                    self.entry_eb.config(state=tk.DISABLED)
+                    self.entry_sample_no.config(state=tk.DISABLED)
+                    self.entry_sample_vol.config(state=tk.DISABLED)
+                    self.radio_ethanol1.config(state=tk.DISABLED)
+                    self.radio_ethanol2.config(state=tk.DISABLED)
+                    self.button_ok.config(state=tk.DISABLED)
+
+        except ValueError:
+            messagebox.showerror('Notice', 'You did not enter valid numbers')
+    
+    def start_run(self):
+        '''Uploads the new protocol using 
+        scp -i <key> <file_to_upload> <where_to_place_it>
+
+        Then launches the new protocol using
+        ssh -i <key> <login> -t "sh -lic" <command>
+        -t creates a pseudo terminal on the remote machine (?)
+        sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
+        which is required to initialize everything correctly.
+        Else the robot cannot use any labware or find calibration data. 
+        '''
+        # Upload the new protocol using 
+        # scp -i <key> <file_to_upload> <where_to_place_it>
+        # Defines the multiprocess to be able to handle errors when transferring the protocol to the robot via SCP.
+        time_process = multiprocessing.Process(target=scp_transfer, name="SCP transfer")
+        time_process.start()
+        time_process.join(5)
+        # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
+        if time_process.is_alive():
+            time_process.terminate()
+            messagebox.showerror('Transfer Error!','An error occured during the transfer of the protocol file to the robot.')
+            try:
+                time_process.close()
+            except ValueError:
+                print("Time process still running")
+        else:
+            # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
+            try:
+                # Launch the new protocol using
+                # ssh -i <key> <login> <command>
+                # -t creates a pseudo terminal on the remote machine (?)
+                # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
+                # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'')
+            except:
+                messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')     
+        
+
+    def exit_button(self):
+        '''Closes the entire application.'''
+        self.frame.quit()
+
+    def get_estimate(self):
+        '''Simulates the protocol using opentrons_simulate.exe
+        with the experimental time estimate feature enabled (-e flag).
+        Shows the result in an message box. 
+        '''
+        run = subprocess.run(f"opentrons_simulate.exe -e {protocol_local_filepath}{protocol_name}", capture_output=True, text=True)
+        self.beads_estimate = run.stdout.split('\n')[-4]
+        messagebox.showinfo('Protocol estimate', f'{self.beads_estimate}')
+    
+    def back_button(self):
+        '''Closes the frame for protocol editing and replaces it with a frame for protocol selection.'''
+        self.frame.destroy()
+        Selector()
+
+class qPCR_protocol_config():
+    def __init__(self):
+        self.frame = tk.Frame()
+        self.frame.grid()
+
+        self.file_label = ttk.Label(self.frame, text='File:')
+        self.file_label.grid(row=0, column=0, columnspan=3, padx=10, pady=3, sticky=tk.W)
+
+        self.file_name_label = ttk.Label(self.frame, text='No file chosen', foreground='red')
+        self.file_name_label.grid(row=1, column=0, columnspan=3, padx=10, pady=0, sticky=tk.W)
+
+        self.open_file_dialog_button = ttk.Button(self.frame, text='Choose a file', command=self.open_file_dialog)
+        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10)
+
+        self.button_back = ttk.Button(self.frame, text='Back', command=self.back)
+        self.button_back.grid(row=5, column=2, padx=10, pady=10)
+
+        self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
+        self.start_button.grid(row=5, column=1, padx=10, pady=10)
+        
+        self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.layout_grid, state=tk.DISABLED)
+        self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
+        
+        self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
+        self.estimate_button.grid(row=10, column=1, padx=10, pady=10)
+
+        self._sources = None # klassvariabel som sparar dictionary med sources
+
+    def open_file_dialog(self):
+        filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
+        if filepath:
+            [self.destinations, self.sources] = replace_values_qpcr.csv_till_lista(filepath)
+            self._sources = self.sources
+            replace_values_qpcr.replace_values_qpcr(self.destinations, self.sources)
+
+            '''# how_to_place = ''
+            # for source, source_wells in sources.items():
+            #     how_to_place += str(source)
+            #     how_to_place += '\n'
+            #     for mixture, wells in source_wells.items():
+            #         how_to_place += str(mixture)
+            #         how_to_place += ': '
+            #         how_to_place += str(wells)
+            #         how_to_place += '\n'
+            #     how_to_place += '\n'
+            # messagebox.showinfo('Success!', how_to_place)
+            '''
+
+            # Enable locked buttons
+            self.start_button.config(state=tk.NORMAL)
+            self.grid_button.config(state=tk.NORMAL)
+            self.estimate_button.config(state=tk.NORMAL)
+            # Show name of chosen file
+            self.file_name_label.config(text=filepath.split('/')[-1], foreground='green')
+    
+    def layout_grid(self):
+        # Creates a new window with a notebook widget
+        tube_rack_window = Tube_rack_window()
+
+        # Variable to keep track of the loops
+        tube_racks = []
+
+        # Loop through each type of group (mastermix, sample, standard)
+            # and each mixture in a group (each mastermix etc.)
+        t1 = time.time_ns()
+        for group_name, group_content in self._sources.items():
+            for mixture, [tube_rack, well] in group_content.items():
+                # Checks if a new tab=new tube rack is needed.
+                if tube_rack not in tube_racks:
+                    # Create a new tab in the notebook and add a grid to it.
+                    trw_tab = tube_rack_window.new_tab(tube_rack)
+                    trg = Tube_rack_grid(trw_tab)
+                    tube_racks.append(tube_rack)
+
+                # Find corresponding destination wells to calculate volume needed.
+                for dest_key in self.destinations.keys():
+                    # Remove _source part of name
+                    dest_start = group_name.split('_')[0]
+                    if dest_key.startswith(dest_start):
+                        # Number of destination well for a specific mixture.
+                        dest_amount = len(self.destinations[dest_key][mixture])
+                        # Mastermix requires 6ul, samples/standards require 4ul.
+                        # Calculates total volume required using n+3 wells.
+                        if dest_start == 'mastermix':
+                            dest_vol = 6 * (dest_amount + 3)
+                        else:
+                            dest_vol = 4 * (dest_amount + 3)
+
+                # Capitalizes first letter of name (e.g. Mastermix)
+                # Also adds the specific mixture name, which well to put it in and total volum required. 
+                text = f"{dest_start.title()}:\n{mixture}\n{well}\n{dest_vol} ul"
+                trg.edit(well, text)
+        t2 = time.time_ns()
+        print((t2-t1)//1000000)
+
+        '''
+        ################# NEWER VERSION, NO TABS
+        # trw = tk.Toplevel()
+        # trw.title('Tube rack layout')
+        # trw_base_frame = tk.Frame()
+        # trw_base_frame.grid()
+        # trg1 = Tube_rack_grid(trw, 0, 0)
+        # trg2 = Tube_rack_grid(trw, 1, 0)
+        # trg3 = Tube_rack_grid(trw, 0, 1)
+        # trg4 = Tube_rack_grid(trw, 1, 1)
+        # trg5 = Tube_rack_grid(trw, 0, 2)
+        # trg6 = Tube_rack_grid(trw, 1, 2)
+        '''
+        '''
+        ################## ORIGINAL VERSION
+        # trg = Tube_rack_grid()
+        # window = tk.Toplevel()
+        # window_frame = tk.Frame(window)
+        # window_frame.grid()
+        # trg = Tube_rack_grid()
+
+        # window.grid()
+        
+        # window.title('How to place the Eppendorf tubes in the tube rack')
+        
+        # lista = [] # Lista för alla sources
+        # for group, group_wells in self._sources.items():
+        #     for mixture, mixture_wells in group_wells.items():
+        #         # print(mixture, mixture_wells)
+        #         string = group + '\n' + mixture_wells[1] + '\n' + mixture
+        #         lista.append(string)
+                
+        # testList = ['A1', 'B1', 'C1', 'D1', 'A2', 'B2', 'C2', 'D2', 'A3', 'B3', 'C3', 'D3', 'A4', 'B4', 'C4', 'D4', 'A5', 'B5', 'C5', 'D5', 'A6', 'B6', 'C6', 'D6']
+        # header_letters = ['A', 'B', 'C', 'D']
+        # header_numbers = ['1', '2', '3', '4', '5', '6']        
+        
+        # while len(lista) != 24: # 24 är totalt antal eppendorftuber på hållaren
+        #     lista.append('Nothing')
+        # print(2)    
+        # for i in range(len(lista)):
+        #     if lista[i] == 'Nothing':
+        #         lista[i] = testList[i] + '\n' + 'Nothing'  
+        # print(3)        
+        # # Skapar en 'grid' med vilken source som ska placeras på vilken plats
+        # i = 0
+        # for r in range(1,7):
+        #     for c in range(1,5):
+        #         tk.Label(window, text=lista[i], padx=30, pady=30).grid(row = c, column=r)
+        #         i += 1
+                
+        # # skapar kolumnen med bokstäver A-D längst till vänster
+        # j = 0
+        # for i in range(1,5): # skapar kolumnen med bokstäver A-D längst till vänster
+        #     tk.Label(window, text= header_letters[j],).grid(row=i, column=0, padx=10, pady=10)
+        #     j +=1
+        
+        # # skapar raden med 1-6 högst upp     
+        # y = 0
+        # for i in range(1,7):
+        #     tk.Label(window, text=header_numbers[y],).grid(row=0, column=i, padx=10, pady=10)
+        #     y += 1    
+        '''
+    def start_protocol(self):
+                # Upload the new protocol using 
+        # scp -i <key> <file_to_upload> <where_to_place_it>
+        subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
+        print(f'would have run:\nubprocess.run(scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
+
+        # Launch the new protocol using
+        # ssh -i <key> <login> <command>
+        # -t creates a pseudo terminal on the remote machine (?)
+        # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
+        # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
+        print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
+
+    def get_estimate(self):
+        run = subprocess.run(f"opentrons_simulate.exe -e {protocol_qpcr_local_filepath}{protocol_qpcr_name}", capture_output=True, text=True)
+        self.qPCR_estimate = run.stdout.split('\n')[-4]
+        messagebox.showinfo('Protocol estimate', f'{self.qPCR_estimate}')
+
+    def back(self):
+        self.frame.destroy()
+        Selector()
+
+class Tube_rack_window():
+    def __init__(self):
+        # Create a new window
+        self.window = tk.Toplevel()
+        self.window.title('Tube rack layout')
+        # Create notebook (tabs) associated with the window
+        self.nb = ttk.Notebook(self.window)
+        # Place the notebook to show it
+        self.nb.pack()
+
+        
+
+    def new_tab(self, title):
+        self.frame = tk.Frame(self.nb)
+        self.nb.add(self.frame, text=title)
+        return self.frame
+
+class Tube_rack_grid():
+    def __init__(self, parent):
+        # Creates a frame assigned to the specified parent widget
+        self.parent = parent
+        self.frame = tk.Frame(parent)
+        self.frame.grid()
+
+        # Headers
+        self.header_letters = ['A', 'B', 'C', 'D']
+        self.header_numbers = [str(i) for i in range(1, 7)]
+
+        # Place headers on grid, letters on left-most column and numbers on upper-most row
+        for i, row_letter in enumerate(self.header_letters):
+            ttk.Label(self.frame, text=row_letter, foreground='grey').grid(row=i+1, column=0, padx=20, pady=20)
+        for i, col_num in enumerate(self.header_numbers):
+            ttk.Label(self.frame, text=col_num, foreground='grey').grid(row=0, column=i+1, padx=20, pady=20)
+        
+        # Fill rest of grid with 'Empty'
+        for i in range(len(self.header_letters)):
+            for j in range(len(self.header_numbers)):
+                ttk.Label(self.frame, text='Empty', foreground='black', justify='center').grid(row=i+1, column=j+1, padx=20, pady=20)
+
+    def edit(self, xy, new_text):
+        row_index_to_letter = {0:None, 1:'A', 2:'B', 3:'C', 4:'D'}
+        # Loop through each label on the grid
+        for child in self.frame.children.values():
+            # Find row and column index for each label and convert to well name
+            child_x = row_index_to_letter[child.grid_info()['row']]
+            child_y = str(child.grid_info()['column'])
+            # Edit label text when the correct well is found
+            if child_x == xy[0] and child_y == xy[1]:
+                child.configure(text=str(new_text))
+                break
+
+class Check_window():
+    def __init__(self):
+        self.window = tk.Toplevel()
+        self.window.title('test title')
+        self.frame = tk.Frame(self.window)
+        self.frame.pack() # Show frame on window
+
+        self.test_label = ttk.Label(self.frame, text='test')
+        self.test_label.grid(row=0, column=0, padx=10, pady=10)
+
+        self.image = tk.PhotoImage(file='dbt2021\\qpcr\\test.gif')
+        self.img_label = ttk.Label(self.frame, image=self.image)
+        self.img_label.grid(row=0, column=1) # Show imgage on frame
+        
+
+        # "You need to keep an additional reference to [image] so it 
+        # doesn't get prematurely garbage collected at the end of the
+        # function.
+        # ...'Note: When a PhotoImage object is garbage-collected by 
+        # Python (e.g. when you return from a function which stored 
+        # an image in a local variable), the image is cleared even if
+        # it’s being displayed by a Tkinter widget. 
+        # To avoid this, the program must keep an extra reference to 
+        # the image object.'
+        # ...You could attach the image to you self variable"
+        # "[image] is referenced in the line that creates the photo object,
+        # but the reference count for photo still drops to zero at the end 
+        # of the expression, and photo ceases to exist. This behavior can be
+        # surprising because most custom classes will retain at least one 
+        # reference to any arguments that it needs to make use of later. 
+        # But Label and other Tkinter widgets are essentially thin wrappers 
+        # over Tcl classes implemented in C, which don't go out of their way 
+        # to handle the reference counts of its arguments.""
+        # https://stackoverflow.com/questions/27430648/tkinter-vanishing-photoimage-issue
+
+        # Behöver alltså ej längre global på objektet som skapas från klassen
+        # utan endast följande, vilket knyter image till själva img_label-objectet. 
+        self.img_label.image = self.image 
+
+def run_gui():
+    # Creates a root window
+    root = tk.Tk()
+    root.title('Protocol selector test')
+
+    # Creates a frame for the root window with widgets for protocol selection. 
+    Selector()
+
+    root.mainloop()
+
+# Small function to enable multiprocessing later - used only for error-checking.
+def scp_transfer():
+    subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{protocol_name} {username}@{ip}:{protocol_robot_filepath}{protocol_name}')
+    return  
+
+# Main if-statement that runs the program.
+if __name__ == '__main__':
+    # Runs the main program.
+    run_gui()

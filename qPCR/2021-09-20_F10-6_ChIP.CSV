@@ -1,0 +1,97 @@
+Row,Column,Sample Type,Replicate #,*Target Name,*Sample Name,*Biological Set Name,*Well Note,Starting Quantity,Units
+A,1,Std,1,Spacer,,F10-6_F10,1,5.12E-02,copy number
+A,2,Std,2,Spacer,,F10-6_F10,1,2.56E-02,copy number
+A,3,Std,3,Spacer,,F10-6_F10,1,1.28E-02,copy number
+A,4,Std,4,Spacer,,F10-6_F10,1,6.40E-03,copy number
+A,5,Std,5,Spacer,,F10-6_F10,1,3.20E-03,copy number
+A,6,NTC,,Spacer,,,1,N/A,copy number
+A,7,Unkn,,Spacer,BMI1,F10-6_F10,100,N/A,copy number
+A,8,Unkn,,Spacer,BMI1,F10-6_F10,100,N/A,copy number
+A,9,Unkn,,Spacer,CBX2,F10-6_F10,100,N/A,copy number
+A,10,Unkn,,Spacer,CBX2,F10-6_F10,100,N/A,copy number
+A,11,Unkn,,Spacer,no ab,F10-6_F10,100,N/A,copy number
+A,12,Unkn,,Spacer,no ab,F10-6_F10,100,N/A,copy number
+B,1,Std,7,KLF14-1,,F10-6_F10,1,5.12E-02,copy number
+B,2,Std,8,KLF14-1,,F10-6_F10,1,2.56E-02,copy number
+B,3,Std,9,KLF14-1,,F10-6_F10,1,1.28E-02,copy number
+B,4,Std,10,KLF14-1,,F10-6_F10,1,6.40E-03,copy number
+B,5,Std,11,KLF14-1,,F10-6_F10,1,3.20E-03,copy number
+B,6,NTC,,KLF14-1,,,1,N/A,copy number
+B,7,Unkn,,KLF14-1,BMI1,F10-6_F10,1000,N/A,copy number
+B,8,Unkn,,KLF14-1,BMI1,F10-6_F10,1000,N/A,copy number
+B,9,Unkn,,KLF14-1,CBX2,F10-6_F10,500,N/A,copy number
+B,10,Unkn,,KLF14-1,CBX2,F10-6_F10,500,N/A,copy number
+B,11,Unkn,,KLF14-1,no ab,F10-6_F10,100,N/A,copy number
+B,12,Unkn,,KLF14-1,no ab,F10-6_F10,100,N/A,copy number
+C,1,Std,13,CCND2-1,,F10-6_F10,1,5.12E-02,copy number
+C,2,Std,14,CCND2-1,,F10-6_F10,1,2.56E-02,copy number
+C,3,Std,15,CCND2-1,,F10-6_F10,1,1.28E-02,copy number
+C,4,Std,16,CCND2-1,,F10-6_F10,1,6.40E-03,copy number
+C,5,Std,17,CCND2-1,,F10-6_F10,1,3.20E-03,copy number
+C,6,NTC,,CCND2-1,,,1,N/A,copy number
+C,7,Unkn,,CCND2-1,BMI1,F10-6_F10,1000,N/A,copy number
+C,8,Unkn,,CCND2-1,BMI1,F10-6_F10,1000,N/A,copy number
+C,9,Unkn,,CCND2-1,CBX2,F10-6_F10,500,N/A,copy number
+C,10,Unkn,,CCND2-1,CBX2,F10-6_F10,500,N/A,copy number
+C,11,Unkn,,CCND2-1,no ab,F10-6_F10,100,N/A,copy number
+C,12,Unkn,,CCND2-1,no ab,F10-6_F10,100,N/A,copy number
+D,1,Std,19,CCND2-2,,F10-6_F10,1,5.12E-02,copy number
+D,2,Std,20,CCND2-2,,F10-6_F10,1,2.56E-02,copy number
+D,3,Std,21,CCND2-2,,F10-6_F10,1,1.28E-02,copy number
+D,4,Std,22,CCND2-2,,F10-6_F10,1,6.40E-03,copy number
+D,5,Std,23,CCND2-2,,F10-6_F10,1,3.20E-03,copy number
+D,6,NTC,,CCND2-2,,,1,N/A,copy number
+D,7,Unkn,,CCND2-2,BMI1,F10-6_F10,1000,N/A,copy number
+D,8,Unkn,,CCND2-2,BMI1,F10-6_F10,1000,N/A,copy number
+D,9,Unkn,,CCND2-2,CBX2,F10-6_F10,500,N/A,copy number
+D,10,Unkn,,CCND2-2,CBX2,F10-6_F10,500,N/A,copy number
+D,11,Unkn,,CCND2-2,no ab,F10-6_F10,100,N/A,copy number
+D,12,Unkn,,CCND2-2,no ab,F10-6_F10,100,N/A,copy number
+E,1,Std,25,CCND2-3,,F10-6_F10,1,5.12E-02,copy number
+E,2,Std,26,CCND2-3,,F10-6_F10,1,2.56E-02,copy number
+E,3,Std,27,CCND2-3,,F10-6_F10,1,1.28E-02,copy number
+E,4,Std,28,CCND2-3,,F10-6_F10,1,6.40E-03,copy number
+E,5,Std,29,CCND2-3,,F10-6_F10,1,3.20E-03,copy number
+E,6,NTC,,CCND2-3,,,1,N/A,copy number
+E,7,Unkn,,CCND2-3,BMI1,F10-6_F10,1000,N/A,copy number
+E,8,Unkn,,CCND2-3,BMI1,F10-6_F10,1000,N/A,copy number
+E,9,Unkn,,CCND2-3,CBX2,F10-6_F10,100,N/A,copy number
+E,10,Unkn,,CCND2-3,CBX2,F10-6_F10,100,N/A,copy number
+E,11,Unkn,,CCND2-3,no ab,F10-6_F10,100,N/A,copy number
+E,12,Unkn,,CCND2-3,no ab,F10-6_F10,100,N/A,copy number
+F,1,Std,31,ALX3-1,,F10-6_F10,1,5.12E-02,copy number
+F,2,Std,32,ALX3-1,,F10-6_F10,1,2.56E-02,copy number
+F,3,Std,33,ALX3-1,,F10-6_F10,1,1.28E-02,copy number
+F,4,Std,34,ALX3-1,,F10-6_F10,1,6.40E-03,copy number
+F,5,Std,35,ALX3-1,,F10-6_F10,1,3.20E-03,copy number
+F,6,NTC,,ALX3-1,,,1,N/A,copy number
+F,7,Unkn,,ALX3-1,BMI1,F10-6_F10,100,N/A,copy number
+F,8,Unkn,,ALX3-1,BMI1,F10-6_F10,100,N/A,copy number
+F,9,Unkn,,ALX3-1,CBX2,F10-6_F10,100,N/A,copy number
+F,10,Unkn,,ALX3-1,CBX2,F10-6_F10,100,N/A,copy number
+F,11,Unkn,,ALX3-1,no ab,F10-6_F10,100,N/A,copy number
+F,12,Unkn,,ALX3-1,no ab,F10-6_F10,100,N/A,copy number
+G,1,Std,37,ALX3-2,,F10-6_F10,1,5.12E-02,copy number
+G,2,Std,38,ALX3-2,,F10-6_F10,1,2.56E-02,copy number
+G,3,Std,39,ALX3-2,,F10-6_F10,1,1.28E-02,copy number
+G,4,Std,40,ALX3-2,,F10-6_F10,1,6.40E-03,copy number
+G,5,Std,41,ALX3-2,,F10-6_F10,1,3.20E-03,copy number
+G,6,NTC,,ALX3-2,,,1,N/A,copy number
+G,7,Unkn,,ALX3-2,BMI1,F10-6_F10,100,N/A,copy number
+G,8,Unkn,,ALX3-2,BMI1,F10-6_F10,100,N/A,copy number
+G,9,Unkn,,ALX3-2,CBX2,F10-6_F10,100,N/A,copy number
+G,10,Unkn,,ALX3-2,CBX2,F10-6_F10,100,N/A,copy number
+G,11,Unkn,,ALX3-2,no ab,F10-6_F10,100,N/A,copy number
+G,12,Unkn,,ALX3-2,no ab,F10-6_F10,100,N/A,copy number
+H,1,Std,43,ALX3-3,,F10-6_F10,1,5.12E-02,copy number
+H,2,Std,44,ALX3-3,,F10-6_F10,1,2.56E-02,copy number
+H,3,Std,45,ALX3-3,,F10-6_F10,1,1.28E-02,copy number
+H,4,Std,46,ALX3-3,,F10-6_F10,1,6.40E-03,copy number
+H,5,Std,47,ALX3-3,,F10-6_F10,1,3.20E-03,copy number
+H,6,NTC,,ALX3-3,,,1,N/A,copy number
+H,7,Unkn,,ALX3-3,BMI1,F10-6_F10,100,N/A,copy number
+H,8,Unkn,,ALX3-3,BMI1,F10-6_F10,100,N/A,copy number
+H,9,Unkn,,ALX3-3,CBX2,F10-6_F10,100,N/A,copy number
+H,10,Unkn,,ALX3-3,CBX2,F10-6_F10,100,N/A,copy number
+H,11,Unkn,,ALX3-3,no ab,F10-6_F10,100,N/A,copy number
+H,12,Unkn,,ALX3-3,no ab,F10-6_F10,100,N/A,copy number
