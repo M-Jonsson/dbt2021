@@ -1,0 +1,41 @@
+Row,Column,Sample Type,Replicate #,*Target Name,*Sample Name,*Biological Set Name,*Well Note,Starting Quantity,Units
+A,1,Std,1,Spacer,,F10-6_F10,1,5.12E-02,copy number
+A,6,NTC,,Spacer,,,1,N/A,copy number
+A,7,Unkn,,Spacer,BMI1,F10-6_F10,100,N/A,copy number
+A,9,Unkn,,Spacer,CBX2,F10-6_F10,100,N/A,copy number
+A,11,Unkn,,Spacer,no ab,F10-6_F10,100,N/A,copy number
+B,1,Std,7,KLF14-1,,F10-6_F10,1,5.12E-02,copy number
+B,6,NTC,,KLF14-1,,,1,N/A,copy number
+B,7,Unkn,,KLF14-1,BMI1,F10-6_F10,1000,N/A,copy number
+B,9,Unkn,,KLF14-1,CBX2,F10-6_F10,500,N/A,copy number
+B,11,Unkn,,KLF14-1,no ab,F10-6_F10,100,N/A,copy number
+C,1,Std,13,CCND2-1,,F10-6_F10,1,5.12E-02,copy number
+C,6,NTC,,CCND2-1,,,1,N/A,copy number
+C,7,Unkn,,CCND2-1,BMI1,F10-6_F10,1000,N/A,copy number
+C,9,Unkn,,CCND2-1,CBX2,F10-6_F10,500,N/A,copy number
+C,11,Unkn,,CCND2-1,no ab,F10-6_F10,100,N/A,copy number
+D,1,Std,19,CCND2-2,,F10-6_F10,1,5.12E-02,copy number
+D,6,NTC,,CCND2-2,,,1,N/A,copy number
+D,7,Unkn,,CCND2-2,BMI1,F10-6_F10,1000,N/A,copy number
+D,9,Unkn,,CCND2-2,CBX2,F10-6_F10,500,N/A,copy number
+D,11,Unkn,,CCND2-2,no ab,F10-6_F10,100,N/A,copy number
+E,1,Std,25,CCND2-3,,F10-6_F10,1,5.12E-02,copy number
+E,6,NTC,,CCND2-3,,,1,N/A,copy number
+E,7,Unkn,,CCND2-3,BMI1,F10-6_F10,1000,N/A,copy number
+E,9,Unkn,,CCND2-3,CBX2,F10-6_F10,100,N/A,copy number
+E,11,Unkn,,CCND2-3,no ab,F10-6_F10,100,N/A,copy number
+F,1,Std,31,ALX3-1,,F10-6_F10,1,5.12E-02,copy number
+F,6,NTC,,ALX3-1,,,1,N/A,copy number
+F,7,Unkn,,ALX3-1,BMI1,F10-6_F10,100,N/A,copy number
+F,9,Unkn,,ALX3-1,CBX2,F10-6_F10,100,N/A,copy number
+F,11,Unkn,,ALX3-1,no ab,F10-6_F10,100,N/A,copy number
+G,1,Std,37,ALX3-2,,F10-6_F10,1,5.12E-02,copy number
+G,6,NTC,,ALX3-2,,,1,N/A,copy number
+G,7,Unkn,,ALX3-2,BMI1,F10-6_F10,100,N/A,copy number
+G,9,Unkn,,ALX3-2,CBX2,F10-6_F10,100,N/A,copy number
+G,11,Unkn,,ALX3-2,no ab,F10-6_F10,100,N/A,copy number
+H,1,Std,43,ALX3-3,,F10-6_F10,1,5.12E-02,copy number
+H,6,NTC,,ALX3-3,,,1,N/A,copy number
+H,7,Unkn,,ALX3-3,BMI1,F10-6_F10,100,N/A,copy number
+H,9,Unkn,,ALX3-3,CBX2,F10-6_F10,100,N/A,copy number
+H,11,Unkn,,ALX3-3,no ab,F10-6_F10,100,N/A,copy number
