@@ -16,10 +16,10 @@ Based on instructions from https://towardsdatascience.com/simple-github-integrat
 2. In the terminal window, select Terminal
 3. Open a Git Bash terminal by pressing the small arrow to the right of the plus button (Launch profile...) and select Git Bash.
 4. In the Git Bash terminal enter:
-'''
+```
 git config user.name <your GitHub username>
 git config user.email <the email address of you GitHub account>
-'''
+```
 
 ## Using GitHub with VSCode
 For larger changes, create a fork/branch from the main repo. (Comprabale to making a copy of all files and making edits to those [create a branch], then deleting the old files after everything works [merging to main with a pull request]).
