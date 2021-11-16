@@ -11,6 +11,16 @@ Based on instructions from https://towardsdatascience.com/simple-github-integrat
 2. Select Clone Git Repository and enter url https://github.com/M-Jonsson/dbt2021.git 
 3. Select a folder to locally store the files.
 
+### Update user credentials
+1. In VSCode, open a terminal (terminal -> new terminal in the toolbar on top).
+2. In the terminal window, select Terminal
+3. Open a Git Bash terminal by pressing the small arrow to the right of the plus button (Launch profile...) and select Git Bash.
+4. In the Git Bash terminal enter:
+'''
+git config user.name <your GitHub username>
+git config user.email <the email address of you GitHub account>
+'''
+
 ## Using GitHub with VSCode
 For larger changes, create a fork/branch from the main repo. (Comprabale to making a copy of all files and making edits to those [create a branch], then deleting the old files after everything works [merging to main with a pull request]).
 For smaller changes, the changes can be direclty commited.
