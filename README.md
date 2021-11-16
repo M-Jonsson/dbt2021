@@ -1,6 +1,6 @@
 # DBT2021 - Pipette robot automation
 ## Git/Github setup:
-https://towardsdatascience.com/simple-github-integration-with-vscode-3d7a3db33047
+Based on instructions from https://towardsdatascience.com/simple-github-integration-with-vscode-3d7a3db33047 with some additions and modifications. 
 ### Install all requirements
 1. Create an account on GitHub.
 2. Install Git from https://git-scm.com/
