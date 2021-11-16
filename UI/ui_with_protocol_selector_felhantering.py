@@ -15,12 +15,12 @@ import multiprocessing
 # Files and logins for SSH and SCP
 local_user = getlogin() # os.getlogin() get username on local machine
 key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
-protocol_local_filepath = f'c:\\users\\{local_user}\\Onedrive\\Dokument\\python\\dbt2021\\dna_cleaning\\final\\'
+protocol_local_filepath = f'dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
 protocol_name = 'dna_cleaning_output.py'
 ip = '169.254.29.201'
 username = 'root'
-protocol_qpcr_local_filepath = f'c:\\users\\{local_user}\\Onedrive\\Dokument\\python\\dbt2021\\qpcr\\'
+protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
 
 # Error check to see that the ssh_key is exists.
@@ -71,10 +71,11 @@ class Selector():
 
     def test(self):
         # Check_window()
-        subprocess.run(f'scp -i {key_filename} dbt2021\\dna_cleaning\\final\\purify_less_than_8_custom.py {username}@{ip}:{protocol_robot_filepath}purify_less_than_8_custom.py')
+        # subprocess.run(f'scp -i {key_filename} dna_cleaning\\purify_less_than_8_custom.py {username}@{ip}:{protocol_robot_filepath}purify_less_than_8_custom.py')
 
-        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}purify_less_than_8_custom.py\'')
+        # subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}purify_less_than_8_custom.py\'')
 
+        Check_window()
 
 class Bead_protocol_config():
     '''Contains a frame with widgets used configure a magnetic bead DNA purification protocol.
@@ -301,19 +302,6 @@ class qPCR_protocol_config():
             self._sources = self.sources
             replace_values_qpcr.replace_values_qpcr(self.destinations, self.sources)
 
-            '''# how_to_place = ''
-            # for source, source_wells in sources.items():
-            #     how_to_place += str(source)
-            #     how_to_place += '\n'
-            #     for mixture, wells in source_wells.items():
-            #         how_to_place += str(mixture)
-            #         how_to_place += ': '
-            #         how_to_place += str(wells)
-            #         how_to_place += '\n'
-            #     how_to_place += '\n'
-            # messagebox.showinfo('Success!', how_to_place)
-            '''
-
             # Enable locked buttons
             self.start_button.config(state=tk.NORMAL)
             self.grid_button.config(state=tk.NORMAL)
@@ -361,68 +349,6 @@ class qPCR_protocol_config():
         t2 = time.time_ns()
         print((t2-t1)//1000000)
 
-        '''
-        ################# NEWER VERSION, NO TABS
-        # trw = tk.Toplevel()
-        # trw.title('Tube rack layout')
-        # trw_base_frame = tk.Frame()
-        # trw_base_frame.grid()
-        # trg1 = Tube_rack_grid(trw, 0, 0)
-        # trg2 = Tube_rack_grid(trw, 1, 0)
-        # trg3 = Tube_rack_grid(trw, 0, 1)
-        # trg4 = Tube_rack_grid(trw, 1, 1)
-        # trg5 = Tube_rack_grid(trw, 0, 2)
-        # trg6 = Tube_rack_grid(trw, 1, 2)
-        '''
-        '''
-        ################## ORIGINAL VERSION
-        # trg = Tube_rack_grid()
-        # window = tk.Toplevel()
-        # window_frame = tk.Frame(window)
-        # window_frame.grid()
-        # trg = Tube_rack_grid()
-
-        # window.grid()
-        
-        # window.title('How to place the Eppendorf tubes in the tube rack')
-        
-        # lista = [] # Lista för alla sources
-        # for group, group_wells in self._sources.items():
-        #     for mixture, mixture_wells in group_wells.items():
-        #         # print(mixture, mixture_wells)
-        #         string = group + '\n' + mixture_wells[1] + '\n' + mixture
-        #         lista.append(string)
-                
-        # testList = ['A1', 'B1', 'C1', 'D1', 'A2', 'B2', 'C2', 'D2', 'A3', 'B3', 'C3', 'D3', 'A4', 'B4', 'C4', 'D4', 'A5', 'B5', 'C5', 'D5', 'A6', 'B6', 'C6', 'D6']
-        # header_letters = ['A', 'B', 'C', 'D']
-        # header_numbers = ['1', '2', '3', '4', '5', '6']        
-        
-        # while len(lista) != 24: # 24 är totalt antal eppendorftuber på hållaren
-        #     lista.append('Nothing')
-        # print(2)    
-        # for i in range(len(lista)):
-        #     if lista[i] == 'Nothing':
-        #         lista[i] = testList[i] + '\n' + 'Nothing'  
-        # print(3)        
-        # # Skapar en 'grid' med vilken source som ska placeras på vilken plats
-        # i = 0
-        # for r in range(1,7):
-        #     for c in range(1,5):
-        #         tk.Label(window, text=lista[i], padx=30, pady=30).grid(row = c, column=r)
-        #         i += 1
-                
-        # # skapar kolumnen med bokstäver A-D längst till vänster
-        # j = 0
-        # for i in range(1,5): # skapar kolumnen med bokstäver A-D längst till vänster
-        #     tk.Label(window, text= header_letters[j],).grid(row=i, column=0, padx=10, pady=10)
-        #     j +=1
-        
-        # # skapar raden med 1-6 högst upp     
-        # y = 0
-        # for i in range(1,7):
-        #     tk.Label(window, text=header_numbers[y],).grid(row=0, column=i, padx=10, pady=10)
-        #     y += 1    
-        '''
     def start_protocol(self):
                 # Upload the new protocol using 
         # scp -i <key> <file_to_upload> <where_to_place_it>
@@ -507,7 +433,7 @@ class Check_window():
         self.test_label = ttk.Label(self.frame, text='test')
         self.test_label.grid(row=0, column=0, padx=10, pady=10)
 
-        self.image = tk.PhotoImage(file='dbt2021\\qpcr\\test.gif')
+        self.image = tk.PhotoImage(file='qpcr\\test.gif')
         self.img_label = ttk.Label(self.frame, image=self.image)
         self.img_label.grid(row=0, column=1) # Show imgage on frame
         
