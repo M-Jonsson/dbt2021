@@ -205,12 +205,13 @@ def run(protocol: protocol_api.ProtocolContext):
     
     #Cleans the samples with EtOH.
     P300.pick_up()
-    p300.flow_rate.aspirate = 30
-    p300.flow_rate.dispense = 30
     for i in range(1, cleanings + 1):
+        p300.flow_rate.aspirate = 30
+        p300.flow_rate.dispense = 30
         p300.aspirate(200, resevoir['A' + str(4 + i)], 3) 
         stepwise_dispense(p300, 200, sample_plate['A1'], 10)
         protocol.delay(seconds=30) #seconds=30
+        p300.flow_rate.dispense = 150
         p300.transfer(200, sample_plate['A1'], resevoir_trash['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
     p300.drop_tip()
     
@@ -242,6 +243,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p10.blow_out()
     p10.drop_tip()
     
+    p300.home()
     mag_deck.disengage()
 
     ###########

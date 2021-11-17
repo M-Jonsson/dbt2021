@@ -191,6 +191,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p10.blow_out()
         p10.drop_tip()
     
+    p300.home()
     mag_deck.disengage()
 
     ###########
