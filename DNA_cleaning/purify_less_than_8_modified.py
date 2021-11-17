@@ -224,8 +224,8 @@ def run(protocol: protocol_api.ProtocolContext):
     P300.pick_up()
     p300.flow_rate.aspirate = 60
     p300.flow_rate.dispense = 60    
-    p300.transfer(vol_eb, resevoir['A3'], sample_plate['A1'], new_tip ='never')
-    custom_mix(p300, 15, vol_eb-3, sample_plate['A1'], 0.6, 1.5)
+    p300.transfer(vol_EB, resevoir['A3'], sample_plate['A1'], new_tip ='never')
+    custom_mix(p300, 15, vol_EB-3, sample_plate['A1'], 0.6, 1.5)
     p300.drop_tip()
       
     
@@ -238,7 +238,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p10.flow_rate.aspirate = 3
     p10.flow_rate.dispense = 10
     P10.pick_up()
-    p10.transfer(vol_eb-3, sample_plate['A1'], clean_plate['A1'], new_tip ='never')
+    p10.transfer(vol_EB-3, sample_plate['A1'], clean_plate['A1'], new_tip ='never')
     p10.blow_out()
     p10.drop_tip()
     
@@ -250,8 +250,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
 #User input variables.
 # Default values:
-# no_samples=4
-# vol_samples=20
-# ratio=1
-# cleanings=1
-# vol_eb=20
+no_samples=4
+vol_samples=20
+ratio=1
+cleanings=1
+vol_EB=20
+# New values from user:

@@ -113,19 +113,19 @@ def run(protocol: protocol_api.ProtocolContext):
     #########################
 
     #Add magnetic beads to samples, and mix.
-    columns = math.ceil(no_samples/8) #calculates how many columnes are filled
+    columns = math.ceil(no_samples / 8) #calculates how many columnes are filled
     volBeads = vol_samples * ratio 
     
     for i in range(1,columns+1):
         p300.pick_up_tip()
-        if (columns==1 or columns==6):
+        if (columns == 1 or columns == 6):
             p300.flow_rate.aspirate=9
             p300.flow_rate.dispense=9            
             custom_mix(resevoir['A1'], 30, 15, p300, 3, 6)         
         p300.flow_rate.aspirate=60
         p300.flow_rate.dispense=60
-        p300.transfer(volBeads, resevoir['A1'].bottom(z=3), sample_plate['A'+str(i)], blow_out=(True), blowout_location='destination well', new_tip='never') 
-        custom_mix(p300, 15, vol_samples+volBeads-5, sample_plate['A'+str(i)], 0.6, 3.5)
+        p300.transfer(volBeads, resevoir['A1'].bottom(z=3), sample_plate['A' + str(i)], blow_out=(True), blowout_location='destination well', new_tip='never') 
+        custom_mix(p300, 15, vol_samples+volBeads-5, sample_plate['A' + str(i)], 0.6, 3.5)
         p300.drop_tip()
     
     
@@ -138,7 +138,7 @@ def run(protocol: protocol_api.ProtocolContext):
     for i in range(1,columns+1):
         p300.pick_up_tip()
         p300.flow_rate.aspirate=15
-        p300.aspirate(vol_samples+volBeads, sample_plate['A'+str(i)].bottom(z=0.8))
+        p300.aspirate(vol_samples+volBeads, sample_plate['A' + str(i)].bottom(z=0.8))
         p300.drop_tip()
     
     #Cleans the samples with EtOH.
@@ -146,17 +146,17 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.flow_rate.aspirate=30
         p300.flow_rate.dispense=30        
         for i in range(1,columns+1):
-            p300.pick_up_tip(tiprack_7.wells('A'+str(i))[0]) 
-            p300.aspirate(200, resevoir_EtOH['A'+str(i)].bottom(z=3),3)
-            stepwise_dispense(p300, 200, sample_plate['A'+str(i)], 10) 
+            p300.pick_up_tip(tiprack_7.wells('A' + str(i))[0]) 
+            p300.aspirate(200, resevoir_EtOH['A' + str(i)].bottom(z=3), 3)
+            stepwise_dispense(p300, 200, sample_plate['A' + str(i)], 10) 
             p300.return_tip() #returns tip to the box
         
         if columns < 4:
             protocol.delay(seconds=30) #delays the protocol 30 seconds if there is fewer than 4 columns
        
         for k in range(1,columns+1):
-            p300.pick_up_tip(tiprack_7.wells('A'+str(k))[0])
-            p300.transfer(200, sample_plate['A'+str(k)].bottom(z=0.2), resevoir_trash['A'+str(k)].bottom(z=5), blow_out=(True), blowout_location='destination well', new_tip='never') #transfers the EtOH to a trash deep-well-plate
+            p300.pick_up_tip(tiprack_7.wells('A' + str(k))[0])
+            p300.transfer(200, sample_plate['A' + str(k)].bottom(z=0.2), resevoir_trash['A' + str(k)].bottom(z=5), blow_out=(True), blowout_location='destination well', new_tip='never') #transfers the EtOH to a trash deep-well-plate
             if j < cleanings:
                 p300.return_tip()
             elif j == cleanings:
@@ -170,11 +170,11 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #Add EB and mix.
     for i in range(1,columns+1): 
-        p300.flow_rate.apsirate=60
-        p300.flow_rate.dispense=60
+        p300.flow_rate.aspirate = 60
+        p300.flow_rate.dispense = 60
         p300.pick_up_tip()
-        p300.transfer(vol_eb, resevoir['A3'].bottom(z=5), sample_plate['A'+str(i)], new_tip ='never')
-        custom_mix(p300, 15, vol_eb-3, sample_plate['A'+str(i)], 0.6, 1.5)
+        p300.transfer(vol_EB, resevoir['A3'].bottom(z=5), sample_plate['A' + str(i)], new_tip ='never')
+        custom_mix(p300, 15, vol_EB-3, sample_plate['A' + str(i)], 0.6, 1.5)
         p300.drop_tip()  
     
     #Disengage magnet to release DNA. Wait 1 min.
@@ -187,7 +187,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p10.flow_rate.dispense = 10
     for i in range(1,columns+1):
         p10.pick_up_tip()
-        p10.transfer(vol_eb-3, sample_plate['A'+str(i)].bottom(z=1), clean_plate['A'+str(i)].bottom(z=0.4), new_tip ='never')
+        p10.transfer(vol_EB-3, sample_plate['A' + str(i)].bottom(z=1), clean_plate['A' + str(i)].bottom(z=0.4), new_tip ='never')
         p10.blow_out()
         p10.drop_tip()
     
@@ -199,8 +199,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
 #User input variables.
 # Default values
-# no_samples = 20
-# vol_samples = 20
-# ratio = 0.8
-# cleanings = 1
-# vol_eb= 15
+no_samples = 20
+vol_samples = 20
+ratio = 0.8
+cleanings = 1
+vol_EB= 15
+# New values from user:
