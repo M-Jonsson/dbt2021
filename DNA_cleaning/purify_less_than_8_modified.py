@@ -74,14 +74,12 @@ def stepwise_dispense(pipette, volume, well, steps):
             Nothing.
     """
     step_volume = volume/steps
-    pipette.flow_rate.dispense=30
     for i in range(steps):
         volume_added = (i+1)*step_volume #total volume added efter the step is done
         #polyn. describing relationship between height and volume
         #applies only to 200ul 96-well PCR plate from bio rad
         dispense_height = (-2.5+((2.5**2)+4.9+1.42*volume_added)**(1/2)) + 1 #additional 1 mm above est. level
         pipette.dispense(step_volume, well.bottom(z=dispense_height))
-    pipette.flow_rate.dispense = 300
 
 class Pipette:
     """
@@ -182,15 +180,15 @@ def run(protocol: protocol_api.ProtocolContext):
     #########################
 
     #Add magnetic beads to samples, and mix.
-    volBeads = vol_samples * ratio
+    vol_beads = vol_samples * ratio
     P300.pick_up()
-    p300.flow_rate.aspirate=30
-    p300.flow_rate.dispense=30        
+    p300.flow_rate.aspirate = 9
+    p300.flow_rate.dispense = 9        
     custom_mix(p300, 15, 30, resevoir['A1'], 1.5, 3)
-    p300.flow_rate.aspirate=60
-    p300.flow_rate.dispense=60
-    p300.transfer(volBeads, resevoir['A1'], sample_plate['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
-    custom_mix(p300, 15, vol_samples+volBeads-5, sample_plate['A1'], 0.6, 3.5)
+    p300.flow_rate.aspirate = 60
+    p300.flow_rate.dispense = 60
+    p300.transfer(vol_beads, resevoir['A1'], sample_plate['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
+    custom_mix(p300, 15, vol_samples+vol_beads-5, sample_plate['A1'], 0.6, 3.5)
     p300.drop_tip()
     
     #Wait 5 min. Engage magnet. Wait 5 min.
@@ -199,18 +197,18 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.delay(minutes=5) #minutes=5
 
     #Remove liquid from sample.
-    p300.flow_rate.aspirate = 15
     P300.pick_up()
-    p300.aspirate(vol_samples+volBeads, sample_plate['A1'])
+    p300.flow_rate.aspirate = 15
+    p300.aspirate(vol_samples+vol_beads, sample_plate['A1'])
     p300.drop_tip()
     
     
     #Cleans the samples with EtOH.
     P300.pick_up()
-    for i in range(1,cleanings+1):
-        p300.flow_rate.aspirate = 30
-        p300.flow_rate.dispense = 30
-        p300.aspirate(200, resevoir['A'+str(4+i)],3) 
+    p300.flow_rate.aspirate = 30
+    p300.flow_rate.dispense = 30
+    for i in range(1, cleanings + 1):
+        p300.aspirate(200, resevoir['A' + str(4 + i)], 3) 
         stepwise_dispense(p300, 200, sample_plate['A1'], 10)
         protocol.delay(seconds=30) #seconds=30
         p300.transfer(200, sample_plate['A1'], resevoir_trash['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
@@ -223,10 +221,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
 
     #Add EB and mix.
-    p300.flow_rate.dispense = 60
-    p300.flow_rate.aspirate = 60
-
     P300.pick_up()
+    p300.flow_rate.aspirate = 60
+    p300.flow_rate.dispense = 60    
     p300.transfer(vol_EB, resevoir['A3'], sample_plate['A1'], new_tip ='never')
     custom_mix(p300, 15, vol_EB-3, sample_plate['A1'], 0.6, 1.5)
     p300.drop_tip()
@@ -253,8 +250,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
 #User input variables.
 # Default values:
-# no_samples=4
-# vol_samples=20
-# ratio=1
-# cleanings=1
-# vol_EB=20
+no_samples=4
+vol_samples=20
+ratio=1
+cleanings=1
+vol_EB=20
+# New values from user:

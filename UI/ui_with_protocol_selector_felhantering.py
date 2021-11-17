@@ -26,9 +26,9 @@ protocol_qpcr_name = 'qpcr_output.py'
 # Error check to see that the ssh_key is exists.
 if os.path.isfile(key_filename):
     print("ssh-key read successfully.")
-# else:
-#     messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
-    # sys.exit(0)
+else:
+    messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
+    sys.exit(0)
 
 class Selector():
     ''' Contains a frame with widgets used to select which protocol to edit.
