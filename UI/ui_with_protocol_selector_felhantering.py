@@ -11,6 +11,7 @@ import os.path
 import sys
 import time
 import multiprocessing
+import socket
 
 # Files and logins for SSH and SCP
 local_user = getlogin() # os.getlogin() get username on local machine
@@ -423,6 +424,87 @@ class Tube_rack_grid():
                 child.configure(text=str(new_text))
                 break
 
+class Checkbox:
+    def __init__(self):
+        self.window = tk.Toplevel()
+        self.window.title('checkboxes')
+        self.frame = tk.Frame(self.window)
+        self.frame.pack()
+        
+        self.ssh_conection = False
+        
+        self.var1 = tk.IntVar()
+        self.var2 = tk.IntVar()
+        self.var3 = tk.IntVar()
+        self.var4 = tk.IntVar()
+        
+        #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
+        self.connection_button = tk.Button(self.frame, text='Check Connection', command= self.check_ssh)
+        self.connection_button.grid(row=4, column=0, padx=20, pady=20)
+        
+        self.run_protocol_button = tk.Button(self.frame, text='Run Protocol', command= None, state='disabled')
+        self.run_protocol_button.grid(row=4, column= 1, padx=20, pady=20)
+        
+        self.label1 = tk.Label(self.frame, text='Is everything placed correctly on the deck?').grid(row=0, column=1)
+        self.label2 = tk.Label(self.frame, text='Do you have a ssh-connection').grid(row=1, column=1)
+        self.label3 = tk.Label(self.frame, text='Is the robot using the correct pipettes?').grid(row=2, column=1)
+        self.label4 = tk.Label(self.frame, text='123 123 123 Placeholder 123').grid(row=3, column=1)
+        
+        self.checkbox1 = tk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
+        self.checkbox1.grid(column=0, row=0, pady=20)
+        
+        self.checkbox2 = tk.Checkbutton(self.frame, variable=self.var2, onvalue=1, offvalue=0, command=None)
+        self.checkbox2.grid(column=0, row=1, pady=20) 
+        
+        self.checkbox3 = tk.Checkbutton(self.frame, variable=self.var3, onvalue=1, offvalue=0, command=None)
+        self.checkbox3.grid(column=0, row=2, pady=20)
+         
+        self.checkbox4 = tk.Checkbutton(self.frame, variable=self.var4, onvalue=1, offvalue=0, command=None)
+        self.checkbox4.grid(column=0, row=3, pady=20)
+        
+        self.image = tk.PhotoImage(file='deck_96.gif')
+        self.img_label = ttk.Label(self.frame, image=self.image)
+        self.img_label.grid(row=0, column=3, rowspan=6) # Show imgage on frame
+        
+    def check_ssh(self):
+        host = 'localhost'
+        port = 22
+        self.ssh_conection = False
+        print(1)
+        try:
+            test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            test_socket.connect((host, port))
+            print(2)
+        except Exception:
+        # not up, log reason from ex if wanted
+            print(3)
+    
+        else:
+            test_socket.close()
+            self.ssh_conection = True
+            print(4)
+            
+        if self.ssh_conection or self.var2.get() == 1:
+            self.run_protocol_button.config(state='normal')
+            print(5)
+        else:
+            tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
+            print(6)
+            
+    def run_protocol(self, protocol_type):
+                        # Upload the new protol using 
+        # scp -i <key> <file_to_upload> <where_to_place_it>
+        subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
+        print(f'would have run:\nubprocess.run(scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
+        
+        # Launch the new protocol using
+        # ssh -i <key> <login> <command>
+        # -t creates a pseudo terminal on the remote machine (?)
+        # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
+        # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
+        print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
+
 class Check_window():
     def __init__(self):
         self.window = tk.Toplevel()
@@ -469,6 +551,7 @@ def run_gui():
 
     # Creates a frame for the root window with widgets for protocol selection. 
     Selector()
+    Checkbox()
 
     root.mainloop()
 
