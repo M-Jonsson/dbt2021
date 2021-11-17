@@ -250,8 +250,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
 #User input variables.
 # Default values:
-no_samples=4
-vol_samples=20
-ratio=1
-cleanings=1
-vol_eb=20
+# no_samples=4
+# vol_samples=20
+# ratio=1
+# cleanings=1
+# vol_eb=20
