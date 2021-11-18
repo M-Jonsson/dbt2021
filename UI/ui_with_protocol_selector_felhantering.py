@@ -425,11 +425,12 @@ class Tube_rack_grid():
                 break
 
 class Checkbox:
-    def __init__(self):
+    def __init__(self, protocol_type):
         self.window = tk.Toplevel()
         self.window.title('checkboxes')
         self.frame = tk.Frame(self.window)
         self.frame.pack()
+        self.protocol_type = protocol_type
         
         self.ssh_conection = False
         
@@ -442,7 +443,7 @@ class Checkbox:
         self.connection_button = tk.Button(self.frame, text='Check Connection', command= self.check_ssh)
         self.connection_button.grid(row=4, column=0, padx=20, pady=20)
         
-        self.run_protocol_button = tk.Button(self.frame, text='Run Protocol', command= None, state='disabled')
+        self.run_protocol_button = tk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
         self.run_protocol_button.grid(row=4, column= 1, padx=20, pady=20)
         
         self.label1 = tk.Label(self.frame, text='Is everything placed correctly on the deck?').grid(row=0, column=1)
@@ -491,19 +492,58 @@ class Checkbox:
             tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
             print(6)
             
-    def run_protocol(self, protocol_type):
-                        # Upload the new protol using 
-        # scp -i <key> <file_to_upload> <where_to_place_it>
-        subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
-        print(f'would have run:\nubprocess.run(scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
-        
-        # Launch the new protocol using
-        # ssh -i <key> <login> <command>
-        # -t creates a pseudo terminal on the remote machine (?)
-        # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
-        # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
-        print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
+    def run_protocol(self):
+        print(f'this should run the protocol {self.protocol_type}')
+
+        if self.protocol_type == 'dna_cleaning_output.py':
+            '''Uploads the new protocol using 
+            scp -i <key> <file_to_upload> <where_to_place_it>
+            Then launches the new protocol using
+            ssh -i <key> <login> -t "sh -lic" <command> -t creates a pseudo terminal on the remote machine (?)
+            sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
+            which is required to initialize everything correctly.
+            Else the robot cannot use any labware or find calibration data. 
+            '''
+            # Upload the new protocol using 
+            # scp -i <key> <file_to_upload> <where_to_place_it>
+            # Defines the multiprocess to be able to handle errors when transferring the protocol to the robot via SCP.
+            time_process = multiprocessing.Process(target=scp_transfer, name="SCP transfer")
+            time_process.start()
+            time_process.join(5)
+            # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
+            if time_process.is_alive():
+                time_process.terminate()
+                messagebox.showerror('Transfer Error!','An error occured during the transfer of the protocol file to the robot.')
+                try:
+                    time_process.close()
+                except ValueError:
+                    print("Time process still running")
+            else:
+                # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
+                try:
+                    # Launch the new protocol using
+                    # ssh -i <key> <login> <command>
+                    # -t creates a pseudo terminal on the remote machine (?)
+                    # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
+                    # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+                    subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'')
+                except:
+                    messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')
+
+        if self.protocol_type == 'qpcr_output.py':
+            # Upload the new protol using 
+            # # scp -i <key> <file_to_upload> <where_to_place_it>
+            #subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
+            print(f'would have run:\nsubprocess.run(scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
+            
+            # Launch the new protocol using
+            # ssh -i <key> <login> <command>
+            # -t creates a pseudo terminal on the remote machine (?)
+            # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
+            # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+            #subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
+            print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
+
 
 class Check_window():
     def __init__(self):
@@ -551,7 +591,8 @@ def run_gui():
 
     # Creates a frame for the root window with widgets for protocol selection. 
     Selector()
-    Checkbox()
+    #Checkbox('qpcr_output.py')
+    Checkbox('dna_cleaning_output.py')
 
     root.mainloop()
 
