@@ -137,6 +137,18 @@ class Bead_protocol_config():
 
         self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
         self.button_estimate.grid(row=15, column=1, padx=10, pady=10)
+
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads)
+        self.prepare_for_run.grid(row=15, column=2, padx=10, pady=10)
+    
+    def call_checkbox_beads(self):
+        '''The purpuse of this function is to call the Checkbox() class, it checks the number of samples and uses
+        deck_less_8.gif is the sample number is <8, otherwise it uses dec_96.gif'''
+
+        if int(self.entry_sample_no.get()) < 8:
+            Checkbox('dna_cleaning_output.py', 'deck_less_8.gif')
+        else:
+            Checkbox('dna_cleaning_output.py', 'deck_96.gif')
  
     def ok_button(self):
         ''' Checks if all entries are valid.
@@ -294,7 +306,16 @@ class qPCR_protocol_config():
         self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
         self.estimate_button.grid(row=10, column=1, padx=10, pady=10)
 
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr)
+        self.prepare_for_run.grid(row=10, column=2, padx=10, pady=10)
+
         self._sources = None # klassvariabel som sparar dictionary med sources
+    
+    def call_checkbox_qpcr(self):
+        '''The purpuse of this function is to call the Checkbox() class, currently we do
+        not have a picture for the qpcr deck layout, the picture is a placeholder.'''
+
+        Checkbox('qpcr_output.py','deck_96.gif')
 
     def open_file_dialog(self):
         filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
@@ -425,10 +446,11 @@ class Tube_rack_grid():
                 break
 
 class Checkbox:
-    def __init__(self, protocol_type):
+    '''Checkbox class containing checkboxes and other stuff. very bare bones at the moment'''
+    def __init__(self, protocol_type, image):
         self.window = tk.Toplevel()
         self.window.title('checkboxes')
-        self.frame = tk.Frame(self.window)
+        self.frame = ttk.Frame(self.window)
         self.frame.pack()
         self.protocol_type = protocol_type
         
@@ -446,28 +468,30 @@ class Checkbox:
         self.run_protocol_button = tk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
         self.run_protocol_button.grid(row=4, column= 1, padx=20, pady=20)
         
-        self.label1 = tk.Label(self.frame, text='Is everything placed correctly on the deck?').grid(row=0, column=1)
-        self.label2 = tk.Label(self.frame, text='Do you have a ssh-connection').grid(row=1, column=1)
-        self.label3 = tk.Label(self.frame, text='Is the robot using the correct pipettes?').grid(row=2, column=1)
-        self.label4 = tk.Label(self.frame, text='123 123 123 Placeholder 123').grid(row=3, column=1)
+        self.label1 = ttk.Label(self.frame, text='Is everything placed correctly on the deck?').grid(row=0, column=1)
+        self.label2 = ttk.Label(self.frame, text='Do you have a ssh-connection').grid(row=1, column=1)
+        self.label3 = ttk.Label(self.frame, text='Is the robot using the correct pipettes?').grid(row=2, column=1)
+        self.label4 = ttk.Label(self.frame, text='123 123 123 Placeholder 123').grid(row=3, column=1)
         
-        self.checkbox1 = tk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
+        self.checkbox1 = ttk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
         self.checkbox1.grid(column=0, row=0, pady=20)
         
-        self.checkbox2 = tk.Checkbutton(self.frame, variable=self.var2, onvalue=1, offvalue=0, command=None)
+        self.checkbox2 = ttk.Checkbutton(self.frame, variable=self.var2, onvalue=1, offvalue=0, command=None)
         self.checkbox2.grid(column=0, row=1, pady=20) 
         
-        self.checkbox3 = tk.Checkbutton(self.frame, variable=self.var3, onvalue=1, offvalue=0, command=None)
+        self.checkbox3 = ttk.Checkbutton(self.frame, variable=self.var3, onvalue=1, offvalue=0, command=None)
         self.checkbox3.grid(column=0, row=2, pady=20)
          
-        self.checkbox4 = tk.Checkbutton(self.frame, variable=self.var4, onvalue=1, offvalue=0, command=None)
+        self.checkbox4 = ttk.Checkbutton(self.frame, variable=self.var4, onvalue=1, offvalue=0, command=None)
         self.checkbox4.grid(column=0, row=3, pady=20)
         
-        self.image = tk.PhotoImage(file='deck_96.gif')
+        self.image = tk.PhotoImage(file=image)
         self.img_label = ttk.Label(self.frame, image=self.image)
         self.img_label.grid(row=0, column=3, rowspan=6) # Show imgage on frame
         
     def check_ssh(self):
+        '''This function should check if you have a ssh-connection, the host variable should be changed to the robot ip (i think)'''
+
         host = 'localhost'
         port = 22
         self.ssh_conection = False
@@ -485,7 +509,7 @@ class Checkbox:
             self.ssh_conection = True
             print(4)
             
-        if self.ssh_conection or self.var2.get() == 1:
+        if self.ssh_conection or self.var2.get() == 1: #change or to and, or is here for testing purpuses
             self.run_protocol_button.config(state='normal')
             print(5)
         else:
@@ -493,9 +517,12 @@ class Checkbox:
             print(6)
             
     def run_protocol(self):
+        '''This function runs the protocols, which one it runs is determined by the variable protocol_type when the an object is created.'''
+
         print(f'this should run the protocol {self.protocol_type}')
 
         if self.protocol_type == 'dna_cleaning_output.py':
+            print('Running magentic beads protocol')
             '''Uploads the new protocol using 
             scp -i <key> <file_to_upload> <where_to_place_it>
             Then launches the new protocol using
@@ -503,6 +530,7 @@ class Checkbox:
             sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
             which is required to initialize everything correctly.
             Else the robot cannot use any labware or find calibration data. 
+            '''
             '''
             # Upload the new protocol using 
             # scp -i <key> <file_to_upload> <where_to_place_it>
@@ -529,6 +557,7 @@ class Checkbox:
                     subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'')
                 except:
                     messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')
+                '''
 
         if self.protocol_type == 'qpcr_output.py':
             # Upload the new protol using 
@@ -592,7 +621,7 @@ def run_gui():
     # Creates a frame for the root window with widgets for protocol selection. 
     Selector()
     #Checkbox('qpcr_output.py')
-    Checkbox('dna_cleaning_output.py')
+    #Checkbox('dna_cleaning_output.py')
 
     root.mainloop()
 
