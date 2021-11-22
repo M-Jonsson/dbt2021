@@ -24,6 +24,8 @@ username = 'root'
 protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
 
+font = (16)
+
 # Error check to see that the ssh_key is exists.
 if os.path.isfile(key_filename):
     print("ssh-key read successfully.")
@@ -126,9 +128,6 @@ class Bead_protocol_config():
         self.button_ok = ttk.Button(self.frame, text='Ok', command=self.ok_button)
         self.button_ok.grid(row=10, column=0, padx=10, pady=10)
 
-        self.button_exit = ttk.Button(self.frame, text='Exit', command=self.exit_button)
-        self.button_exit.grid(row=10, column=1, padx=10, pady=10)
-
         self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button)
         self.button_back.grid(row=10, column=2, padx=10, pady=10)
 
@@ -138,7 +137,7 @@ class Bead_protocol_config():
         self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
         self.button_estimate.grid(row=15, column=1, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads)
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads, state=tk.DISABLED)
         self.prepare_for_run.grid(row=15, column=2, padx=10, pady=10)
     
     def call_checkbox_beads(self):
@@ -146,9 +145,9 @@ class Bead_protocol_config():
         deck_less_8.gif is the sample number is <8, otherwise it uses dec_96.gif'''
 
         if int(self.entry_sample_no.get()) < 8:
-            Checkbox('dna_cleaning_output.py', 'deck_less_8.gif')
+            Checkbox('dna_cleaning_output.py', 'ui\\deck_less_8.gif')
         else:
-            Checkbox('dna_cleaning_output.py', 'deck_96.gif')
+            Checkbox('dna_cleaning_output.py', 'ui\\deck_96.gif')
  
     def ok_button(self):
         ''' Checks if all entries are valid.
@@ -211,6 +210,7 @@ class Bead_protocol_config():
                     # Allow starting or simulating the now created protocol
                     self.button_estimate.config(state=tk.NORMAL)
                     self.button_start.config(state=tk.NORMAL)
+                    self.prepare_for_run.config(state=tk.NORMAL)
 
                     # Disable editing values since a protocol has been created
                     self.entry_bead_ratio.config(state=tk.DISABLED)
@@ -260,11 +260,6 @@ class Bead_protocol_config():
                 subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'')
             except:
                 messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')     
-        
-
-    def exit_button(self):
-        '''Closes the entire application.'''
-        self.frame.quit()
 
     def get_estimate(self):
         '''Simulates the protocol using opentrons_simulate.exe
@@ -315,7 +310,7 @@ class qPCR_protocol_config():
         '''The purpuse of this function is to call the Checkbox() class, currently we do
         not have a picture for the qpcr deck layout, the picture is a placeholder.'''
 
-        Checkbox('qpcr_output.py','deck_96.gif')
+        Checkbox('qpcr_output.py','ui\\deck_96.gif')
 
     def open_file_dialog(self):
         filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
@@ -455,43 +450,43 @@ class Checkbox:
         self.protocol_type = protocol_type
         
         self.ssh_conection = False
+
+        if self.protocol_type == 'qpcr_output.py':
+            pass
+        else:
+            self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
+
         
-        self.var1 = tk.IntVar()
-        self.var2 = tk.IntVar()
-        self.var3 = tk.IntVar()
-        self.var4 = tk.IntVar()
+        # self.var1 = tk.IntVar()
         
         #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
-        self.connection_button = tk.Button(self.frame, text='Check Connection', command= self.check_ssh)
-        self.connection_button.grid(row=4, column=0, padx=20, pady=20)
+        self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh)
+        self.connection_button.grid(row=3, column=1, padx=10, pady=10, sticky=tk.W)
         
-        self.run_protocol_button = tk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
-        self.run_protocol_button.grid(row=4, column= 1, padx=20, pady=20)
+        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
+        self.run_protocol_button.grid(row=20, column= 1, padx=20, pady=20, sticky=tk.W)
         
-        self.label1 = ttk.Label(self.frame, text='Is everything placed correctly on the deck?').grid(row=0, column=1)
-        self.label2 = ttk.Label(self.frame, text='Do you have a ssh-connection').grid(row=1, column=1)
-        self.label3 = ttk.Label(self.frame, text='Is the robot using the correct pipettes?').grid(row=2, column=1)
-        self.label4 = ttk.Label(self.frame, text='123 123 123 Placeholder 123').grid(row=3, column=1)
-        
-        self.checkbox1 = ttk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
-        self.checkbox1.grid(column=0, row=0, pady=20)
-        
-        self.checkbox2 = ttk.Checkbutton(self.frame, variable=self.var2, onvalue=1, offvalue=0, command=None)
-        self.checkbox2.grid(column=0, row=1, pady=20) 
-        
-        self.checkbox3 = ttk.Checkbutton(self.frame, variable=self.var3, onvalue=1, offvalue=0, command=None)
-        self.checkbox3.grid(column=0, row=2, pady=20)
-         
-        self.checkbox4 = ttk.Checkbutton(self.frame, variable=self.var4, onvalue=1, offvalue=0, command=None)
-        self.checkbox4.grid(column=0, row=3, pady=20)
+        self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font).grid(row=10, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+
+        self.volumes = ttk.Label(self.frame, text='\n     Ethanol: ___ ul per well\n     EB: ___ ul per well', font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+
+        self.connection_status = ttk.Label(self.frame, text=' ', font=font)
+        self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
+
+
+        # self.checkbox1 = ttk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
+        # self.checkbox1.grid(column=0, row=0, pady=20)
         
         self.image = tk.PhotoImage(file=image)
         self.img_label = ttk.Label(self.frame, image=self.image)
-        self.img_label.grid(row=0, column=3, rowspan=6) # Show imgage on frame
+        self.img_label.grid(row=0, column=5, rowspan=30) # Show imgage on frame
         
     def check_ssh(self):
         '''This function should check if you have a ssh-connection, the host variable should be changed to the robot ip (i think)'''
 
+        self.connection_status.config(text='Checking connection...', foreground='green')
         host = 'localhost'
         port = 22
         self.ssh_conection = False
@@ -509,11 +504,13 @@ class Checkbox:
             self.ssh_conection = True
             print(4)
             
-        if self.ssh_conection or self.var2.get() == 1: #change or to and, or is here for testing purpuses
+        if self.ssh_conection:
             self.run_protocol_button.config(state='normal')
+            self.connection_status.config(text='Connection OK', foreground='green')
             print(5)
         else:
-            tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
+            # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
+            self.connection_status.config(text='Connection failed', foreground='red')
             print(6)
             
     def run_protocol(self):
