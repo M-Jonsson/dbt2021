@@ -44,17 +44,17 @@ class Selector():
         self.frame = tk.Frame()
         self.frame.grid()
 
-        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol')
-        self.label_selection_info.grid(row=0, column=0, padx=10, pady=10)
+        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', font = 14 )
+        self.label_selection_info.grid(row=0, column=0, padx=20, pady=20)
 
         self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads)
-        self.button_beads.grid(row=1, column=0, padx=10, pady=10)
+        self.button_beads.grid(row=1, column=0, padx=10,ipadx=5, ipady=5)
 
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr)
-        self.button_qpcr.grid(row=1, column=1, padx=10, pady=10)
+        self.button_qpcr.grid(row=1, column=1, padx=10, pady=10,ipadx=10, ipady=10)
 
-        self.button_test = ttk.Button(self.frame, text='test', command=self.test)
-        self.button_test.grid(row=1, column=2)
+        self.button_test = ttk.Button(self.frame, text='Test', command=self.test)
+        self.button_test.grid(row=1, column=4, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
         '''Closes the frame for protocol selection, but not the root window.
@@ -461,10 +461,10 @@ class Checkbox:
         
         #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
         self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh)
-        self.connection_button.grid(row=3, column=1, padx=10, pady=10, sticky=tk.W)
+        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=10, ipady=10, sticky=tk.W)
         
         self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
-        self.run_protocol_button.grid(row=20, column= 1, padx=20, pady=20, sticky=tk.W)
+        self.run_protocol_button.grid(row=20, column= 1, padx=20, pady=20, ipadx=10, ipady=10, sticky=tk.W)
         
         self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
@@ -503,7 +503,7 @@ class Checkbox:
             test_socket.close()
             self.ssh_conection = True
             print(4)
-            
+
         if self.ssh_conection:
             self.run_protocol_button.config(state='normal')
             self.connection_status.config(text='Connection OK', foreground='green')
