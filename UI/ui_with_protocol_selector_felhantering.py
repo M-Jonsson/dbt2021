@@ -93,11 +93,11 @@ class Bead_protocol_config():
         self.frame.grid()
 
         # Labels
-        self.label_sample_no = ttk.Label(self.frame, text='How many samples:')
-        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample:')
-        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio:')
-        self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes:')
-        self.label_eb = ttk.Label(self.frame, text='Volume EB:')
+        self.label_sample_no = ttk.Label(self.frame, text='How many samples: \n(Valid values between 1-96 samples) ')
+        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample: \n(Valid values between 15-40 μl) ')
+        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio: \n(Valid ratios between 0.5-1.5 )')
+        self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes: ')
+        self.label_eb = ttk.Label(self.frame, text='Volume EB: \n(Valid values between 15-25 μl)')
 
         self.label_sample_no.grid(row=0, column=0, padx= 10, pady= 10, sticky=tk.W)
         self.label_sample_vol.grid(row=2, column=0, padx= 10, pady= 10, stick=tk.W)
