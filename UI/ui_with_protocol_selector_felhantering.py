@@ -48,7 +48,7 @@ class Selector():
         self.label_selection_info.grid(row=0, column=0, padx=20, pady=20)
 
         self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads)
-        self.button_beads.grid(row=1, column=0, padx=10,ipadx=5, ipady=5)
+        self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=5)
 
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr)
         self.button_qpcr.grid(row=1, column=1, padx=10, pady=10,ipadx=10, ipady=10)
