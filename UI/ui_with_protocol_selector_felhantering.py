@@ -43,17 +43,19 @@ class Selector():
         # Main frame for the protocol selection, to which all associated widgets are added
         self.frame = tk.Frame()
         self.frame.grid()
+        s = ttk.Style()
+        s.configure('my.TButton', font=( 14))
 
         self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', font = 14 )
         self.label_selection_info.grid(row=0, column=0, padx=20, pady=20)
 
-        self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads)
+        self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads,style='my.TButton')
         self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=5)
 
-        self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr)
+        self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr,style='my.TButton')
         self.button_qpcr.grid(row=1, column=1, padx=10, pady=10,ipadx=10, ipady=10)
 
-        self.button_test = ttk.Button(self.frame, text='Test', command=self.test)
+        self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
         self.button_test.grid(row=1, column=4, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
