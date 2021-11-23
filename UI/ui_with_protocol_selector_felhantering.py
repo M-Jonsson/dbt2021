@@ -26,6 +26,7 @@ protocol_qpcr_name = 'qpcr_output.py'
 
 font = (16)
 
+
 # Error check to see that the ssh_key is exists.
 if os.path.isfile(key_filename):
     print("ssh-key read successfully.")
@@ -43,20 +44,23 @@ class Selector():
         # Main frame for the protocol selection, to which all associated widgets are added
         self.frame = tk.Frame()
         self.frame.grid()
-        s = ttk.Style()
-        s.configure('my.TButton', font=( 14))
+        self.s = ttk.Style()
+        self.s.configure('my.TButton', font=('Helvetica', 12), background = 'grey')
+        self.s.configure('small.TButton', font=('Helvetica', 10), background = 'grey')
+        self.s.configure('my.TLabel', font =('Helvetica', 15))
+        self.s.configure('text.TLabel', font=('Helvetica', 10))
 
-        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', font = 14 )
+        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', style ='my.TLabel')
         self.label_selection_info.grid(row=0, column=0, padx=20, pady=20)
 
         self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads,style='my.TButton')
-        self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=5)
+        self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=1)
 
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr,style='my.TButton')
         self.button_qpcr.grid(row=1, column=1, padx=10, pady=10,ipadx=10, ipady=10)
 
         self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
-        self.button_test.grid(row=1, column=4, padx=10, pady=10,ipadx=10, ipady=10)
+        self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
         '''Closes the frame for protocol selection, but not the root window.
@@ -95,11 +99,11 @@ class Bead_protocol_config():
         self.frame.grid()
 
         # Labels
-        self.label_sample_no = ttk.Label(self.frame, text='How many samples: \n(Valid values between 1-96 samples) ')
-        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample: \n(Valid values between 15-40 μl) ')
-        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio: \n(Valid ratios between 0.5-1.5 )')
-        self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes: ')
-        self.label_eb = ttk.Label(self.frame, text='Volume EB: \n(Valid values between 15-25 μl)')
+        self.label_sample_no = ttk.Label(self.frame, text='How many samples: \n(Valid values between 1-96 samples)', style='text.TLabel')
+        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample: \n(Valid values between 15-40 μl)', style='text.TLabel')
+        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio: \n(Valid ratios between 0.5-1.5)', style='text.TLabel')
+        self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes: ', style='text.TLabel')
+        self.label_eb = ttk.Label(self.frame, text='Volume EB: \n(Valid values between 15-25 μl)', style='text.TLabel')
 
         self.label_sample_no.grid(row=0, column=0, padx= 10, pady= 10, sticky=tk.W)
         self.label_sample_vol.grid(row=2, column=0, padx= 10, pady= 10, stick=tk.W)
@@ -127,19 +131,19 @@ class Bead_protocol_config():
         self.radio_ethanol2.grid(row=6, column=2,  padx=10, pady=10)
 
         # Buttons
-        self.button_ok = ttk.Button(self.frame, text='Ok', command=self.ok_button)
+        self.button_ok = ttk.Button(self.frame, text='Ok', command=self.ok_button, style='small.TButton')
         self.button_ok.grid(row=10, column=0, padx=10, pady=10)
 
-        self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button)
+        self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button, style='small.TButton')
         self.button_back.grid(row=10, column=2, padx=10, pady=10)
 
-        self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run, state=tk.DISABLED)
+        self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run,style='small.TButton', state=tk.DISABLED)
         self.button_start.grid(row=15, column=0, padx=10, pady=10)
 
-        self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
+        self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, style='small.TButton', state=tk.DISABLED)
         self.button_estimate.grid(row=15, column=1, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads, state=tk.DISABLED)
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads, style='small.TButton', state=tk.DISABLED)
         self.prepare_for_run.grid(row=15, column=2, padx=10, pady=10)
     
     def call_checkbox_beads(self):
@@ -147,9 +151,9 @@ class Bead_protocol_config():
         deck_less_8.gif is the sample number is <8, otherwise it uses dec_96.gif'''
 
         if int(self.entry_sample_no.get()) < 8:
-            Checkbox('dna_cleaning_output.py', 'ui\\deck_less_8.gif')
+            Checkbox('dna_cleaning_output.py', 'deck_less_8.gif')
         else:
-            Checkbox('dna_cleaning_output.py', 'ui\\deck_96.gif')
+            Checkbox('dna_cleaning_output.py', 'deck_96.gif')
  
     def ok_button(self):
         ''' Checks if all entries are valid.
@@ -282,28 +286,28 @@ class qPCR_protocol_config():
         self.frame = tk.Frame()
         self.frame.grid()
 
-        self.file_label = ttk.Label(self.frame, text='File:')
+        self.file_label = ttk.Label(self.frame, text='File:', style='my.TLabel')
         self.file_label.grid(row=0, column=0, columnspan=3, padx=10, pady=3, sticky=tk.W)
 
-        self.file_name_label = ttk.Label(self.frame, text='No file chosen', foreground='red')
+        self.file_name_label = ttk.Label(self.frame, text='No file chosen', foreground='red', style='my.TLabel')
         self.file_name_label.grid(row=1, column=0, columnspan=3, padx=10, pady=0, sticky=tk.W)
 
-        self.open_file_dialog_button = ttk.Button(self.frame, text='Choose a file', command=self.open_file_dialog)
-        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10)
+        self.open_file_dialog_button = ttk.Button(self.frame, text='Choose a file', command=self.open_file_dialog, style='my.TButton')
+        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10, ipadx=10)
 
-        self.button_back = ttk.Button(self.frame, text='Back', command=self.back)
+        self.button_back = ttk.Button(self.frame, text='Back', command=self.back, style='my.TButton')
         self.button_back.grid(row=5, column=2, padx=10, pady=10)
 
-        self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
+        self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED, style='my.TButton')
         self.start_button.grid(row=5, column=1, padx=10, pady=10)
         
-        self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.layout_grid, state=tk.DISABLED)
+        self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.layout_grid, state=tk.DISABLED, style='my.TButton')
         self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
         
-        self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
+        self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED, style='my.TButton')
         self.estimate_button.grid(row=10, column=1, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr)
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, style='my.TButton')
         self.prepare_for_run.grid(row=10, column=2, padx=10, pady=10)
 
         self._sources = None # klassvariabel som sparar dictionary med sources
@@ -312,7 +316,7 @@ class qPCR_protocol_config():
         '''The purpuse of this function is to call the Checkbox() class, currently we do
         not have a picture for the qpcr deck layout, the picture is a placeholder.'''
 
-        Checkbox('qpcr_output.py','ui\\deck_96.gif')
+        Checkbox('qpcr_output.py','deck_96.gif')
 
     def open_file_dialog(self):
         filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
@@ -450,11 +454,12 @@ class Checkbox:
         self.frame = ttk.Frame(self.window)
         self.frame.pack()
         self.protocol_type = protocol_type
-        
+
+    
         self.ssh_conection = False
 
         if self.protocol_type == 'qpcr_output.py':
-            pass
+            self.pipette_text = '\n     Left: placeholder\n     Right: placeholder'
         else:
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
 
@@ -474,12 +479,12 @@ class Checkbox:
 
         self.volumes = ttk.Label(self.frame, text='\n     Ethanol: ___ ul per well\n     EB: ___ ul per well', font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
-        self.connection_status = ttk.Label(self.frame, text=' ', font=font)
+        self.connection_status = ttk.Label(self.frame, text='Check Connection', style='my.TLabel', foreground= 'green')
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
 
 
-        # self.checkbox1 = ttk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
-        # self.checkbox1.grid(column=0, row=0, pady=20)
+        #self.checkbox1 = ttk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
+        #self.checkbox1.grid(column=0, row=0, pady=20)
         
         self.image = tk.PhotoImage(file=image)
         self.img_label = ttk.Label(self.frame, image=self.image)
@@ -488,8 +493,9 @@ class Checkbox:
     def check_ssh(self):
         '''This function should check if you have a ssh-connection, the host variable should be changed to the robot ip (i think)'''
 
-        self.connection_status.config(text='Checking connection...', foreground='green')
-        host = 'localhost'
+        self.connection_status.configure(text='Checking connection...', foreground='green')
+        
+        host = 'localhost' #used for testing purposes, should be robot IP
         port = 22
         self.ssh_conection = False
         print(1)
@@ -508,11 +514,11 @@ class Checkbox:
 
         if self.ssh_conection:
             self.run_protocol_button.config(state='normal')
-            self.connection_status.config(text='Connection OK', foreground='green')
+            self.connection_status.configure(text='Connection OK', foreground='green')
             print(5)
         else:
             # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
-            self.connection_status.config(text='Connection failed', foreground='red')
+            self.connection_status.configure(text='Connection failed', foreground='red')
             print(6)
             
     def run_protocol(self):
