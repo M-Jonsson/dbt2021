@@ -103,7 +103,7 @@ class Bead_protocol_config():
         self.label_sample_vol = ttk.Label(self.frame, text='Volume sample: \n(Valid values between 15-40 μl)', style='text.TLabel')
         self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio: \n(Valid ratios between 0.5-1.5)', style='text.TLabel')
         self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes: ', style='text.TLabel')
-        self.label_eb = ttk.Label(self.frame, text='Volume EB: \n(Valid values between 15-25 μl)', style='text.TLabel')
+        self.label_eb = ttk.Label(self.frame, text='Volume Elution buffer: \n(Valid values between 15-25 μl)', style='text.TLabel')
 
         self.label_sample_no.grid(row=0, column=0, padx= 10, pady= 10, sticky=tk.W)
         self.label_sample_vol.grid(row=2, column=0, padx= 10, pady= 10, stick=tk.W)
@@ -174,7 +174,7 @@ class Bead_protocol_config():
             
             self.sample_vol = float(self.entry_sample_vol.get())
             if self.sample_vol <= 14.5 or self.sample_vol > 40:
-                messagebox.showerror('Notice', 'Volume amount is too low or too high, choose a volume between 15-40µl')
+                messagebox.showerror('Notice', 'Volume amount is too low or too high, choose a volume between 15-40 µl')
                 self.correct_sample_vol = False
             else:
                 self.correct_sample_vol = True
@@ -195,7 +195,7 @@ class Bead_protocol_config():
 
             self.eb = float(self.entry_eb.get())
             if self.eb < 15 or self.eb > 25:
-                messagebox.showerror('Notice', 'EB volume is too low or too high, choose an EB volume between 15-25µl')
+                messagebox.showerror('Notice', 'EB volume is too low or too high, choose an EB volume between 15-25 µl')
                 self.correct_eb = False
             else:
                 self.correct_eb = True
@@ -477,7 +477,7 @@ class Checkbox:
         self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font).grid(row=10, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
-        self.volumes = ttk.Label(self.frame, text='\n     Ethanol: ___ ul per well\n     EB: ___ ul per well', font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.volumes = ttk.Label(self.frame, text='\n     Ethanol:           ___ μl per well\n     Elution buffer: ___  μl per well', font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
         self.connection_status = ttk.Label(self.frame, text='Check Connection', style='my.TLabel', foreground= 'green')
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
@@ -493,7 +493,8 @@ class Checkbox:
     def check_ssh(self):
         '''This function should check if you have a ssh-connection, the host variable should be changed to the robot ip (i think)'''
 
-        self.connection_status.configure(text='Checking connection...', foreground='green')
+        self.connection_status.config(text='Checking connection...', foreground='green')
+        self.connection_status.update()
         
         host = 'localhost' #used for testing purposes, should be robot IP
         port = 22
@@ -503,6 +504,7 @@ class Checkbox:
             test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             test_socket.connect((host, port))
             print(2)
+            
         except Exception:
         # not up, log reason from ex if wanted
             print(3)
