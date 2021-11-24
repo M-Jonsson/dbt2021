@@ -18,7 +18,7 @@ local_user = getlogin() # os.getlogin() get username on local machine
 key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
 protocol_local_filepath = f'dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
-protocol_name = 'dna_cleaning_output.py'
+protocol_dna_name = 'dna_cleaning_output.py'
 ip = '169.254.29.201'
 username = 'root'
 protocol_qpcr_local_filepath = f'qPCR\\'
@@ -32,6 +32,7 @@ if os.path.isfile(key_filename):
 # else:
 #     messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
     # sys.exit(0)
+
 
 class Selector():
     ''' Contains a frame with widgets used to select which protocol to edit.
@@ -77,8 +78,8 @@ class Selector():
         # subprocess.run(f'scp -i {key_filename} dna_cleaning\\purify_less_than_8_custom.py {username}@{ip}:{protocol_robot_filepath}purify_less_than_8_custom.py')
 
         # subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}purify_less_than_8_custom.py\'')
-
-        Check_window()
+        
+        pass
 
 class Bead_protocol_config():
     '''Contains a frame with widgets used configure a magnetic bead DNA purification protocol.
@@ -144,10 +145,9 @@ class Bead_protocol_config():
         '''The purpuse of this function is to call the Checkbox() class, it checks the number of samples and uses
         deck_less_8.gif is the sample number is <8, otherwise it uses dec_96.gif'''
 
-        if int(self.entry_sample_no.get()) < 8:
-            Checkbox('dna_cleaning_output.py', 'ui\\deck_less_8.gif')
-        else:
-            Checkbox('dna_cleaning_output.py', 'ui\\deck_96.gif')
+        self.window = tk.Toplevel()
+        sample_no = int(self.entry_sample_no.get())
+        Checkbox(parent=self.window, protocol_type=protocol_dna_name, num_samples=sample_no)
  
     def ok_button(self):
         ''' Checks if all entries are valid.
@@ -257,7 +257,7 @@ class Bead_protocol_config():
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'')
+                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_dna_name}\'')
             except:
                 messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')     
 
@@ -266,7 +266,7 @@ class Bead_protocol_config():
         with the experimental time estimate feature enabled (-e flag).
         Shows the result in an message box. 
         '''
-        run = subprocess.run(f"opentrons_simulate.exe -e {protocol_local_filepath}{protocol_name}", capture_output=True, text=True)
+        run = subprocess.run(f"opentrons_simulate.exe -e {protocol_local_filepath}{protocol_dna_name}", capture_output=True, text=True)
         self.beads_estimate = run.stdout.split('\n')[-4]
         messagebox.showinfo('Protocol estimate', f'{self.beads_estimate}')
     
@@ -295,8 +295,8 @@ class qPCR_protocol_config():
         self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
         self.start_button.grid(row=5, column=1, padx=10, pady=10)
         
-        self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.layout_grid, state=tk.DISABLED)
-        self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
+        # self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.create_layout_window, state=tk.DISABLED)
+        # self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
         
         self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
         self.estimate_button.grid(row=10, column=1, padx=10, pady=10)
@@ -310,7 +310,26 @@ class qPCR_protocol_config():
         '''The purpuse of this function is to call the Checkbox() class, currently we do
         not have a picture for the qpcr deck layout, the picture is a placeholder.'''
 
-        Checkbox('qpcr_output.py','ui\\deck_96.gif')
+        self.window = tk.Toplevel()
+        # self.fill_notebook(self.window)
+        self.frame_list = tk.Frame(self.window)
+        self.frame_list.grid(row=0, column=0)
+
+        checkbox = Checkbox(parent=self.frame_list, protocol_type='qpcr')
+
+        checkbox.add_tube_racks(self.window, self.sources, self.destinations)
+
+
+        # self.frame_tube_racks = tk.Frame(self.window)
+        # self.frame_tube_racks.grid(row=0, column=1)
+
+        # base = Tube_rack_base(self.frame_tube_racks)
+
+        # self.deck_tab = base.new_tab('Deck')
+        # self.deck_img = Checkbox_img(self.deck_tab, 'qpcr\\test.gif')
+
+        # base.fill_notebook(self._sources, self.destinations)
+        
 
     def open_file_dialog(self):
         filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
@@ -321,51 +340,20 @@ class qPCR_protocol_config():
 
             # Enable locked buttons
             self.start_button.config(state=tk.NORMAL)
-            self.grid_button.config(state=tk.NORMAL)
+            # self.grid_button.config(state=tk.NORMAL)
             self.estimate_button.config(state=tk.NORMAL)
             # Show name of chosen file
             self.file_name_label.config(text=filepath.split('/')[-1], foreground='green')
     
-    def layout_grid(self):
-        # Creates a new window with a notebook widget
-        tube_rack_window = Tube_rack_window()
+    # def create_layout_window(self):
+    #     '''Only used for "Layout grid" button.
+    #     Can be removed when the Checkbox works.'''
+    #     self.window = tk.Toplevel()
+    #     self.layout_base = Tube_rack_base(self.window)
 
-        # Variable to keep track of the loops
-        tube_racks = []
+    #     self.layout_base.fill_notebook(self._sources, self.destinations)
 
-        # Loop through each type of group (mastermix, sample, standard)
-            # and each mixture in a group (each mastermix etc.)
-        t1 = time.time_ns()
-        for group_name, group_content in self._sources.items():
-            for mixture, [tube_rack, well] in group_content.items():
-                # Checks if a new tab=new tube rack is needed.
-                if tube_rack not in tube_racks:
-                    # Create a new tab in the notebook and add a grid to it.
-                    trw_tab = tube_rack_window.new_tab(tube_rack)
-                    trg = Tube_rack_grid(trw_tab)
-                    tube_racks.append(tube_rack)
-
-                # Find corresponding destination wells to calculate volume needed.
-                for dest_key in self.destinations.keys():
-                    # Remove _source part of name
-                    dest_start = group_name.split('_')[0]
-                    if dest_key.startswith(dest_start):
-                        # Number of destination well for a specific mixture.
-                        dest_amount = len(self.destinations[dest_key][mixture])
-                        # Mastermix requires 6ul, samples/standards require 4ul.
-                        # Calculates total volume required using n+3 wells.
-                        if dest_start == 'mastermix':
-                            dest_vol = 6 * (dest_amount + 3)
-                        else:
-                            dest_vol = 4 * (dest_amount + 3)
-
-                # Capitalizes first letter of name (e.g. Mastermix)
-                # Also adds the specific mixture name, which well to put it in and total volum required. 
-                text = f"{dest_start.title()}:\n{mixture}\n{well}\n{dest_vol} ul"
-                trg.edit(well, text)
-        t2 = time.time_ns()
-        print((t2-t1)//1000000)
-
+        
     def start_protocol(self):
                 # Upload the new protocol using 
         # scp -i <key> <file_to_upload> <where_to_place_it>
@@ -389,24 +377,67 @@ class qPCR_protocol_config():
         self.frame.destroy()
         Selector()
 
-class Tube_rack_window():
-    def __init__(self):
-        # Create a new window
-        self.window = tk.Toplevel()
-        self.window.title('Tube rack layout')
+class Tube_rack_base():
+    '''Base frame with notebook tabs. 
+    Function to add new tabs.
+    Parent is which window to add it to.
+    '''
+    def __init__(self, parent):
+        self.parent = parent
+        self.frame = tk.Frame(self.parent)
         # Create notebook (tabs) associated with the window
-        self.nb = ttk.Notebook(self.window)
-        # Place the notebook to show it
-        self.nb.pack()
+        self.notebook = ttk.Notebook(self.frame)
 
-        
+        self.frame.pack()
+        self.notebook.grid(row=0, column=1)
 
     def new_tab(self, title):
-        self.frame = tk.Frame(self.nb)
-        self.nb.add(self.frame, text=title)
-        return self.frame
+        self.tab_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.tab_frame, text=title)
+        return self.tab_frame
 
+    def fill_notebook(self, sources, destinations):
+        # Variable to keep track of the loops
+        tube_racks = []
+
+        self.sources = sources
+        self.destinations = destinations
+
+        # Loop through each type of group (mastermix, sample, standard)
+            # and each mixture in a group (each mastermix etc.)
+        for group_name, group_content in self.sources.items():
+            for mixture, [tube_rack, well] in group_content.items():
+                # Checks if a new tab=new tube rack is needed.
+                if tube_rack not in tube_racks:
+                    # Create a new tab in the notebook and add a grid to it.
+                    trw_tab = self.new_tab(tube_rack)
+                    trg = Tube_rack_grid(trw_tab)
+                    tube_racks.append(tube_rack)
+
+                # Find corresponding destination wells to calculate volume needed.
+                for dest_key in self.destinations.keys():
+                    # Remove _source part of name
+                    dest_start = group_name.split('_')[0]
+                    if dest_key.startswith(dest_start):
+                        # Number of destination well for a specific mixture.
+                        dest_amount = len(self.destinations[dest_key][mixture])
+                        # Mastermix requires 6ul, samples/standards require 4ul.
+                        # Calculates total volume required using n+3 wells.
+                        if dest_start == 'mastermix':
+                            dest_vol = 6 * (dest_amount + 3)
+                        else:
+                            dest_vol = 4 * (dest_amount + 3)
+
+                # Capitalizes first letter of name (e.g. Mastermix)
+                # Also adds the specific mixture name, which well to put it in and total volum required. 
+                text = f"{dest_start.title()}:\n{mixture}\n{well}\n{dest_vol} ul"
+                trg.edit(well, text)
+    
 class Tube_rack_grid():
+    '''Tube rack layout grid used to populate the base notebook.
+    __init__ creates a base layout which can then be edited with edit()
+    to add the "real" values.  
+    '''
     def __init__(self, parent):
         # Creates a frame assigned to the specified parent widget
         self.parent = parent
@@ -431,39 +462,46 @@ class Tube_rack_grid():
     def edit(self, xy, new_text):
         row_index_to_letter = {0:None, 1:'A', 2:'B', 3:'C', 4:'D'}
         # Loop through each label on the grid
-        for child in self.frame.children.values():
+        for child_values in self.frame.children.values():
             # Find row and column index for each label and convert to well name
-            child_x = row_index_to_letter[child.grid_info()['row']]
-            child_y = str(child.grid_info()['column'])
+            child_x = row_index_to_letter[child_values.grid_info()['row']]
+            child_y = str(child_values.grid_info()['column'])
             # Edit label text when the correct well is found
             if child_x == xy[0] and child_y == xy[1]:
-                child.configure(text=str(new_text))
+                child_values.configure(text=str(new_text))
                 break
 
 class Checkbox:
     '''Checkbox class containing checkboxes and other stuff. very bare bones at the moment'''
-    def __init__(self, protocol_type, image):
-        self.window = tk.Toplevel()
-        self.window.title('checkboxes')
-        self.frame = ttk.Frame(self.window)
+    def __init__(self, parent, protocol_type: str, num_samples=None):
+        self.parent = parent
+        self.frame = ttk.Frame(self.parent)
         self.frame.pack()
         self.protocol_type = protocol_type
-        
         self.ssh_conection = False
 
-        if self.protocol_type == 'qpcr_output.py':
-            pass
-        else:
+        if self.protocol_type.startswith('qpcr'): # qPCR protocol
+            self.image_name = 'qPCR\\test.gif'
+            self.pipette_text = '\n     Left: ? ?-channel\n     Right: ? ?-channel'
+        elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
+            self.image_name = 'ui\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
+            self.add_image(self.frame, self.image_name)
+        elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
+            self.image_name = 'ui\\deck_less_8.gif'
+            self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
+            self.add_image(self.frame, self.image_name)
 
-        
+        else:
+            messagebox.showerror('Error', f"Invalid protocol type '{self.protocol_type}' entered.")
+    
         # self.var1 = tk.IntVar()
         
         #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
         self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh)
         self.connection_button.grid(row=3, column=1, padx=10, pady=10, sticky=tk.W)
         
-        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
+        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state=tk.DISABLED)
         self.run_protocol_button.grid(row=20, column= 1, padx=20, pady=20, sticky=tk.W)
         
         self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
@@ -479,84 +517,96 @@ class Checkbox:
         # self.checkbox1 = ttk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
         # self.checkbox1.grid(column=0, row=0, pady=20)
         
-        self.image = tk.PhotoImage(file=image)
-        self.img_label = ttk.Label(self.frame, image=self.image)
+    def add_image(self, parent, image_path):
+        self.image = tk.PhotoImage(file=image_path)
+        self.img_label = ttk.Label(parent, image=self.image)
         self.img_label.grid(row=0, column=5, rowspan=30) # Show imgage on frame
-        
-    def check_ssh(self):
-        '''This function should check if you have a ssh-connection, the host variable should be changed to the robot ip (i think)'''
+    
+    def add_tube_racks(self, parent, sources, destinations):
+        self.parent = parent
+        self.frame_tube_racks = tk.Frame(self.parent)
+        self.frame_tube_racks.grid(row=0, column=1)
 
-        self.connection_status.config(text='Checking connection...', foreground='green')
+        base = Tube_rack_base(self.frame_tube_racks)
+
+        self.deck_tab = base.new_tab('Deck')
+        self.add_image(self.deck_tab, 'qpcr\\test.gif')
+
+        base.fill_notebook(sources, destinations)
+
+
+    def check_ssh(self):
+        '''This function should check if you have a ssh-connection,
+        the host variable should be changed to the robot ip (i think)'''
+
+        self.connection_status.config(text='Checking connection...', foreground='black')
+        self.connection_status.update()
         host = 'localhost'
         port = 22
         self.ssh_conection = False
-        print(1)
         try:
             test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             test_socket.connect((host, port))
-            print(2)
-        except Exception:
+        except socket.error as error_msg:
         # not up, log reason from ex if wanted
-            print(3)
-    
+            # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
+            print(error_msg)
+            self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
         else:
             test_socket.close()
             self.ssh_conection = True
-            print(4)
-            
-        if self.ssh_conection:
-            self.run_protocol_button.config(state='normal')
+            self.run_protocol_button.config(state=tk.NORMAL)
             self.connection_status.config(text='Connection OK', foreground='green')
-            print(5)
-        else:
-            # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
-            self.connection_status.config(text='Connection failed', foreground='red')
-            print(6)
             
+        
+            
+        
     def run_protocol(self):
         '''This function runs the protocols, which one it runs is determined by the variable protocol_type when the an object is created.'''
 
         print(f'this should run the protocol {self.protocol_type}')
 
-        if self.protocol_type == 'dna_cleaning_output.py':
-            print('Running magentic beads protocol')
-            '''Uploads the new protocol using 
-            scp -i <key> <file_to_upload> <where_to_place_it>
-            Then launches the new protocol using
-            ssh -i <key> <login> -t "sh -lic" <command> -t creates a pseudo terminal on the remote machine (?)
-            sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
-            which is required to initialize everything correctly.
-            Else the robot cannot use any labware or find calibration data. 
-            '''
-            '''
-            # Upload the new protocol using 
-            # scp -i <key> <file_to_upload> <where_to_place_it>
-            # Defines the multiprocess to be able to handle errors when transferring the protocol to the robot via SCP.
-            time_process = multiprocessing.Process(target=scp_transfer, name="SCP transfer")
-            time_process.start()
-            time_process.join(5)
-            # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
-            if time_process.is_alive():
-                time_process.terminate()
-                messagebox.showerror('Transfer Error!','An error occured during the transfer of the protocol file to the robot.')
-                try:
-                    time_process.close()
-                except ValueError:
-                    print("Time process still running")
-            else:
-                # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
-                try:
-                    # Launch the new protocol using
-                    # ssh -i <key> <login> <command>
-                    # -t creates a pseudo terminal on the remote machine (?)
-                    # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
-                    # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                    subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'')
-                except:
-                    messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')
-                '''
+        # if self.protocol_type == 'dna':
 
-        if self.protocol_type == 'qpcr_output.py':
+        print('Running magentic beads protocol')
+        '''Uploads the new protocol using 
+        scp -i <key> <file_to_upload> <where_to_place_it>
+        Then launches the new protocol using
+        ssh -i <key> <login> -t "sh -lic" <command> -t creates a pseudo terminal on the remote machine (?)
+        sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
+        which is required to initialize everything correctly.
+        Else the robot cannot use any labware or find calibration data. 
+        '''
+        
+        # Upload the new protocol using 
+        # scp -i <key> <file_to_upload> <where_to_place_it>
+        # Defines the multiprocess to be able to handle errors when transferring the protocol to the robot via SCP.
+        time_process = multiprocessing.Process(target=scp_transfer, name="SCP transfer")
+        time_process.start()
+        time_process.join(5)
+        # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
+        if time_process.is_alive():
+            time_process.terminate()
+            messagebox.showerror('Transfer Error!','An error occured during the transfer of the protocol file to the robot.')
+            try:
+                time_process.close()
+            except ValueError:
+                print("Time process still running")
+        else:
+            # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
+            try:
+                # Launch the new protocol using
+                # ssh -i <key> <login> <command>
+                # -t creates a pseudo terminal on the remote machine (?)
+                # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
+                # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_dna_name}\'')
+            except:
+                messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')
+            
+
+        # Beads methods should also work for qPCR
+        '''if self.protocol_type == 'qpcr_output.py':
             # Upload the new protol using 
             # # scp -i <key> <file_to_upload> <where_to_place_it>
             #subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
@@ -569,9 +619,11 @@ class Checkbox:
             # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
             #subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
             print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
-
+        '''
 
 class Check_window():
+    '''Not used. Replaced by Checkbox()
+    '''
     def __init__(self):
         self.window = tk.Toplevel()
         self.window.title('test title')
@@ -624,7 +676,7 @@ def run_gui():
 
 # Small function to enable multiprocessing later - used only for error-checking.
 def scp_transfer():
-    subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{protocol_name} {username}@{ip}:{protocol_robot_filepath}{protocol_name}')
+    subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{protocol_dna_name} {username}@{ip}:{protocol_robot_filepath}{protocol_dna_name}')
     return  
 
 # Main if-statement that runs the program.
