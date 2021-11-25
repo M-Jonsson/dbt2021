@@ -153,7 +153,7 @@ class Bead_protocol_config():
         if int(self.entry_sample_no.get()) < 8:
             Checkbox('dna_cleaning_output.py', 'deck_less_8.gif')
         else:
-            Checkbox('dna_cleaning_output.py', 'deck_96.gif')
+            Checkbox('dna_cleaning_output.py', '1deck_96.gif')
  
     def ok_button(self):
         ''' Checks if all entries are valid.
