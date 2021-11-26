@@ -148,12 +148,12 @@ class Bead_protocol_config():
     
     def call_checkbox_beads(self):
         '''The purpuse of this function is to call the Checkbox() class, it checks the number of samples and uses
-        deck_less_8.gif is the sample number is <8, otherwise it uses dec_96.gif'''
+        deck_less_8.gif if the sample number is <8, otherwise it uses deck_96.gif'''
 
         if int(self.entry_sample_no.get()) < 8:
             Checkbox('dna_cleaning_output.py', 'deck_less_8.gif')
         else:
-            Checkbox('dna_cleaning_output.py', '1deck_96.gif')
+            Checkbox('dna_cleaning_output.py', 'deck_96.gif')
  
     def ok_button(self):
         ''' Checks if all entries are valid.
@@ -567,6 +567,20 @@ class Checkbox:
                 '''
 
         if self.protocol_type == 'qpcr_output.py':
+            time_process = multiprocessing.Process(target=scp_transfer_qpcr, name="SCP transfer")
+            time_process.start()
+            time_process.join(5)
+            if time_process.is_alive():
+                time_process.terminate()
+                messagebox.showerror('Transfer Error!','An error occured during the transfer of the protocol file to the robot.')
+                try:
+                    time_process.close()
+                except ValueError:
+                    print("Time process still running")
+            else:
+                # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
+                try:
+
             # Upload the new protol using 
             # # scp -i <key> <file_to_upload> <where_to_place_it>
             #subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
@@ -636,6 +650,9 @@ def run_gui():
 def scp_transfer():
     subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{protocol_name} {username}@{ip}:{protocol_robot_filepath}{protocol_name}')
     return  
+def scp_transfer_qpcr():
+    subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_qpcr_local_filepath}{protocol_qpcr_name}')
+    return
 
 # Main if-statement that runs the program.
 if __name__ == '__main__':
