@@ -583,47 +583,6 @@ class Checkbox:
             print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
         '''
 
-class Check_window():
-    '''Not used. Replaced by Checkbox()
-    '''
-    def __init__(self):
-        self.window = tk.Toplevel()
-        self.window.title('test title')
-        self.frame = tk.Frame(self.window)
-        self.frame.pack() # Show frame on window
-
-        self.test_label = ttk.Label(self.frame, text='test')
-        self.test_label.grid(row=0, column=0, padx=10, pady=10)
-
-        self.image = tk.PhotoImage(file='qpcr\\test.gif')
-        self.img_label = ttk.Label(self.frame, image=self.image)
-        self.img_label.grid(row=0, column=1) # Show imgage on frame
-        
-
-        # "You need to keep an additional reference to [image] so it 
-        # doesn't get prematurely garbage collected at the end of the
-        # function.
-        # ...'Note: When a PhotoImage object is garbage-collected by 
-        # Python (e.g. when you return from a function which stored 
-        # an image in a local variable), the image is cleared even if
-        # it’s being displayed by a Tkinter widget. 
-        # To avoid this, the program must keep an extra reference to 
-        # the image object.'
-        # ...You could attach the image to you self variable"
-        # "[image] is referenced in the line that creates the photo object,
-        # but the reference count for photo still drops to zero at the end 
-        # of the expression, and photo ceases to exist. This behavior can be
-        # surprising because most custom classes will retain at least one 
-        # reference to any arguments that it needs to make use of later. 
-        # But Label and other Tkinter widgets are essentially thin wrappers 
-        # over Tcl classes implemented in C, which don't go out of their way 
-        # to handle the reference counts of its arguments.""
-        # https://stackoverflow.com/questions/27430648/tkinter-vanishing-photoimage-issue
-
-        # Behöver alltså ej längre global på objektet som skapas från klassen
-        # utan endast följande, vilket knyter image till själva img_label-objectet. 
-        self.img_label.image = self.image 
-
 def run_gui():
     # Creates a root window
     root = tk.Tk()
