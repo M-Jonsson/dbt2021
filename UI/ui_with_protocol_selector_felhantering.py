@@ -54,9 +54,6 @@ class Selector():
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr)
         self.button_qpcr.grid(row=1, column=1, padx=10, pady=10)
 
-        self.button_test = ttk.Button(self.frame, text='test', command=self.test)
-        self.button_test.grid(row=1, column=2)
-
     def select_protocol_beads(self):
         '''Closes the frame for protocol selection, but not the root window.
         Then creates a new frame from Bead_protocol_config() for editing a magnetic bead DNA purification protocol.
@@ -72,14 +69,6 @@ class Selector():
 
         self.frame.destroy()
         qPCR_protocol_config()
-
-    def test(self):
-        # Check_window()
-        # subprocess.run(f'scp -i {key_filename} dna_cleaning\\purify_less_than_8_custom.py {username}@{ip}:{protocol_robot_filepath}purify_less_than_8_custom.py')
-
-        # subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}purify_less_than_8_custom.py\'')
-        
-        pass
 
 class Bead_protocol_config():
     '''Contains a frame with widgets used configure a magnetic bead DNA purification protocol.
@@ -295,13 +284,10 @@ class qPCR_protocol_config():
         self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
         self.start_button.grid(row=5, column=1, padx=10, pady=10)
         
-        # self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.create_layout_window, state=tk.DISABLED)
-        # self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
-        
         self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
         self.estimate_button.grid(row=10, column=1, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr)
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, state=tk.DISABLED)
         self.prepare_for_run.grid(row=10, column=2, padx=10, pady=10)
 
         self._sources = None # klassvariabel som sparar dictionary med sources
@@ -320,17 +306,6 @@ class qPCR_protocol_config():
         checkbox.add_tube_racks(self.window, self.sources, self.destinations)
 
 
-        # self.frame_tube_racks = tk.Frame(self.window)
-        # self.frame_tube_racks.grid(row=0, column=1)
-
-        # base = Tube_rack_base(self.frame_tube_racks)
-
-        # self.deck_tab = base.new_tab('Deck')
-        # self.deck_img = Checkbox_img(self.deck_tab, 'qpcr\\test.gif')
-
-        # base.fill_notebook(self._sources, self.destinations)
-        
-
     def open_file_dialog(self):
         filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
         if filepath:
@@ -340,19 +315,10 @@ class qPCR_protocol_config():
 
             # Enable locked buttons
             self.start_button.config(state=tk.NORMAL)
-            # self.grid_button.config(state=tk.NORMAL)
             self.estimate_button.config(state=tk.NORMAL)
+            self.prepare_for_run.config(state=tk.NORMAL)
             # Show name of chosen file
             self.file_name_label.config(text=filepath.split('/')[-1], foreground='green')
-    
-    # def create_layout_window(self):
-    #     '''Only used for "Layout grid" button.
-    #     Can be removed when the Checkbox works.'''
-    #     self.window = tk.Toplevel()
-    #     self.layout_base = Tube_rack_base(self.window)
-
-    #     self.layout_base.fill_notebook(self._sources, self.destinations)
-
         
     def start_protocol(self):
                 # Upload the new protocol using 
@@ -513,10 +479,6 @@ class Checkbox:
         self.connection_status = ttk.Label(self.frame, text=' ', font=font)
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
 
-
-        # self.checkbox1 = ttk.Checkbutton(self.frame,variable=self.var1, onvalue=1, offvalue=0, command=None)
-        # self.checkbox1.grid(column=0, row=0, pady=20)
-        
     def add_image(self, parent, image_path):
         self.image = tk.PhotoImage(file=image_path)
         self.img_label = ttk.Label(parent, image=self.image)
