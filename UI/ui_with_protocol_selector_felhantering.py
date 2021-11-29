@@ -11,6 +11,7 @@ import os.path
 import sys
 import time
 import multiprocessing
+import queue
 import socket
 
 # Files and logins for SSH and SCP
@@ -515,35 +516,55 @@ class Checkbox:
 
 
     def check_ssh(self):
-        '''This function should check if you have a ssh-connection,
-        the host variable should be changed to the robot ip (i think)'''
+        '''This function should check if you have a ssh-connection.
+        Creates a Queue object and passes it to a Process subclass, Threaded_ssh_check().
+        The queue creates a connection between the main process (the UI) and this new process.
+        When the process is started, its run() method is executed,
+        which tries to create a socket connection to the robot ip.
+        After 1 second, calls try_connection() to check if the queue is empty,
+        i.e. if the attempts at creating a socket conneciton is finished.
+        If not, checks again in 3 seconds. 
+        '''
 
         self.connection_status.config(text='Checking connection...', foreground='black')
         self.connection_status.update()
-        # host = 'localhost'
-        host = ip
-        port = 22
+        
+        self.valid_connection = False
 
-        self.connection_progress = ttk.Progressbar(self.frame, orient=tk.HORIZONTAL, length=200, mode='indeterminate')
+        self.connection_progress = ttk.Progressbar(self.frame, orient=tk.HORIZONTAL, length=200, mode='indeterminate', )
         self.connection_progress.grid(row=4, column=2)
-        self.connection_progress.start()
+        self.connection_progress.start(10)
         self.connection_progress.update()
 
-        try:
-            test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            test_socket.connect((host, port))
-        except socket.error as error_msg:
-        # not up, log reason from ex if wanted
-            # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
-            print(error_msg)
-            self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
-        else:
-            test_socket.close()
-            self.run_protocol_button.config(state=tk.NORMAL)
-            self.connection_status.config(text='Connection OK', foreground='green')
-            
+        self.connection_button.config(state=tk.DISABLED)
+
+
+        self.queue = multiprocessing.Queue()
+        self.process = Threaded_ssh_check(self.queue)
+        self.process.start()
+
+        self.connection_progress.after(1000, self.try_connection)
+ 
         
-            
+    def try_connection(self):
+        try:
+            # valid_connection = True
+            valid_connection = self.queue.get_nowait()
+        except queue.Empty:
+            print('checking queue')
+            self.connection_progress.after(3000, self.try_connection)
+        else:
+            if not valid_connection:
+                self.connection_button.config(state=tk.NORMAL)
+                self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
+                self.connection_progress.destroy()
+                
+            elif valid_connection:
+                self.connection_button.config(state=tk.NORMAL)
+                self.run_protocol_button.config(state=tk.NORMAL)
+                self.connection_status.config(text='Connection OK', foreground='green')
+                self.connection_progress.destroy()
+
         
     def run_protocol(self):
         '''This function runs the protocols, which one it runs is determined by the variable protocol_type when the an object is created.'''
@@ -605,6 +626,35 @@ class Checkbox:
             print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
         '''
 
+class Threaded_ssh_check(multiprocessing.Process):
+    def __init__(self, queue):
+        super().__init__()
+        self.queue = queue
+    
+    def run(self):
+        # host = 'localhost'
+        host = ip
+        port = 22
+        try:
+            print(1)
+            test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print(2)
+            test_socket.settimeout(9)
+            test_socket.connect((host, port))
+            print(3)
+        except (socket.error, socket.timeout) as error_msg:
+            # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
+            print(error_msg)
+            # self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
+            self.queue.put(False)
+        else:
+            print(4)
+            test_socket.close()
+            # self.run_protocol_button.config(state=tk.NORMAL)
+            # self.connection_status.config(text='Connection OK', foreground='green')
+            self.queue.put(True)
+
+
 def run_gui():
     # Creates a root window
     root = tk.Tk()
@@ -624,10 +674,8 @@ def run_gui():
 
     root.mainloop()
 
-
 # Small function to enable multiprocessing later - used only for error-checking.
 def scp_transfer(protocol):
-    test = f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{ip}:{protocol_robot_filepath}{protocol[1]}'
     subprocess.run(f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{ip}:{protocol_robot_filepath}{protocol[1]}')
     return  
 
