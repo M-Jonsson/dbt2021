@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
-from tkinter.constants import NORMAL
+from tkinter.constants import HORIZONTAL, NORMAL
 import replace_values
 import replace_values_qpcr
 import subprocess
@@ -25,14 +25,6 @@ protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
 
 font = (16)
-
-
-# Error check to see that the ssh_key is exists.
-if os.path.isfile(key_filename):
-    print("ssh-key read successfully.")
-else:
-    messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
-    sys.exit(0)
 
 
 class Selector():
@@ -532,6 +524,11 @@ class Checkbox:
         host = ip
         port = 22
 
+        self.connection_progress = ttk.Progressbar(self.frame, orient=tk.HORIZONTAL, length=200, mode='indeterminate')
+        self.connection_progress.grid(row=4, column=2)
+        self.connection_progress.start()
+        self.connection_progress.update()
+
         try:
             test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             test_socket.connect((host, port))
@@ -618,7 +615,15 @@ def run_gui():
     #Checkbox('qpcr_output.py')
     #Checkbox('dna_cleaning_output.py')
 
+        # Error check to see that the ssh_key is exists.
+    if os.path.isfile(key_filename):
+        print("ssh-key read successfully.")
+    else:
+        messagebox.showerror('File not found error!', f'SSH Key could not be found. Please check the filepath: {key_filename} and confirm it is placed there')
+        sys.exit(0)
+
     root.mainloop()
+
 
 # Small function to enable multiprocessing later - used only for error-checking.
 def scp_transfer(protocol):
