@@ -58,10 +58,10 @@ class Selector():
         self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=1)
 
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr,style='my.TButton')
-        self.button_qpcr.grid(row=1, column=1, padx=10, pady=10,ipadx=10, ipady=10)
+        self.button_qpcr.grid(row=1, column=1, padx=10, pady=10, ipadx=10, ipady=10)
 
-        self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
-        self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
+        # self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
+        # self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
         '''Closes the frame for protocol selection, but not the root window.
@@ -124,20 +124,20 @@ class Bead_protocol_config():
         self.radio_ethanol2.grid(row=6, column=2,  padx=10, pady=10)
 
         # Buttons
-        self.button_ok = ttk.Button(self.frame, text='Ok', command=self.ok_button, style='small.TButton')
+        self.button_ok = ttk.Button(self.frame, text='Create robot protocol', command=self.ok_button, style='small.TButton')
         self.button_ok.grid(row=10, column=0, padx=10, pady=10)
 
         self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button, style='small.TButton')
-        self.button_back.grid(row=10, column=2, padx=10, pady=10)
+        self.button_back.grid(row=10, column=1, padx=10, pady=10)
 
-        self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run,style='small.TButton', state=tk.DISABLED)
-        self.button_start.grid(row=15, column=0, padx=10, pady=10)
+        # self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run,style='small.TButton', state=tk.DISABLED)
+        # self.button_start.grid(row=15, column=0, padx=10, pady=10)
 
         self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, style='small.TButton', state=tk.DISABLED)
-        self.button_estimate.grid(row=15, column=1, padx=10, pady=10)
+        self.button_estimate.grid(row=15, column=0, padx=10, pady=10)
 
         self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads, style='small.TButton', state=tk.DISABLED)
-        self.prepare_for_run.grid(row=15, column=2, padx=10, pady=10)
+        self.prepare_for_run.grid(row=15, column=1, padx=10, pady=10)
     
     def call_checkbox_beads(self):
         '''The purpuse of this function is to call the Checkbox() class, it checks the number of samples and uses
@@ -207,7 +207,7 @@ class Bead_protocol_config():
 
                     # Allow starting or simulating the now created protocol
                     self.button_estimate.config(state=tk.NORMAL)
-                    self.button_start.config(state=tk.NORMAL)
+                    # self.button_start.config(state=tk.NORMAL)
                     self.prepare_for_run.config(state=tk.NORMAL)
 
                     # Disable editing values since a protocol has been created
@@ -221,7 +221,10 @@ class Bead_protocol_config():
 
         except ValueError:
             messagebox.showerror('Notice', 'You did not enter valid numbers')
-    
+
+    # Should not be needed
+    # Protocol is started from checklist
+    """
     def start_run(self):
         '''Uploads the new protocol using 
         scp -i <key> <file_to_upload> <where_to_place_it>
@@ -258,6 +261,8 @@ class Bead_protocol_config():
                 subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_dna_name}\'')
             except:
                 messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')     
+    """
+
 
     def get_estimate(self):
         '''Simulates the protocol using opentrons_simulate.exe
@@ -290,16 +295,16 @@ class qPCR_protocol_config():
         self.button_back = ttk.Button(self.frame, text='Back', command=self.back, style='my.TButton')
         self.button_back.grid(row=5, column=2, padx=10, pady=10)
 
-        self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED, style='my.TButton')
-        self.start_button.grid(row=5, column=1, padx=10, pady=10)
+        # self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED, style='my.TButton')
+        # self.start_button.grid(row=5, column=1, padx=10, pady=10)
         
-        self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.layout_grid, state=tk.DISABLED, style='my.TButton')
-        self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
+        # self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.layout_grid, state=tk.DISABLED, style='my.TButton')
+        # self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
         
         self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED, style='my.TButton')
-        self.estimate_button.grid(row=10, column=1, padx=10, pady=10)
+        self.estimate_button.grid(row=10, column=0, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, style='my.TButton')
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, state=tk.DISABLED, style='my.TButton')
         self.prepare_for_run.grid(row=10, column=2, padx=10, pady=10)
 
         self._sources = None # klassvariabel som sparar dictionary med sources
@@ -326,12 +331,14 @@ class qPCR_protocol_config():
             replace_values_qpcr.replace_values_qpcr(self.destinations, self.sources)
 
             # Enable locked buttons
-            self.start_button.config(state=tk.NORMAL)
+            # self.start_button.config(state=tk.NORMAL)
             self.estimate_button.config(state=tk.NORMAL)
             self.prepare_for_run.config(state=tk.NORMAL)
             # Show name of chosen file
             self.file_name_label.config(text=filepath.split('/')[-1], foreground='green')
-        
+    
+    # Should not be needed since the protocol will be started from the check list.
+    '''
     def start_protocol(self):
                 # Upload the new protocol using 
         # scp -i <key> <file_to_upload> <where_to_place_it>
@@ -345,6 +352,7 @@ class qPCR_protocol_config():
         # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
         subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
         print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
+    '''
 
     def get_estimate(self):
         run = subprocess.run(f"opentrons_simulate.exe -e {protocol_qpcr_local_filepath}{protocol_qpcr_name}", capture_output=True, text=True)
@@ -456,18 +464,23 @@ class Checkbox:
         self.frame = ttk.Frame(self.parent)
         self.frame.pack()
         self.protocol_type = protocol_type
-        self.ssh_conection = False
 
-        if self.protocol_type.startswith('qpcr'): # qPCR protocol
+        if self.protocol_type.startswith('qpcr'): # qPCR protocol'
+            self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
             self.image_name = 'qPCR\\test.gif'
-            self.pipette_text = '\n     Left: ? ?-channel\n     Right: ? ?-channel'
+            self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
+            self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
+            self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'ui\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
+            self.volumes_label = '\n     Fill wells on the ethanol deep well plate\n     correspoinding to those that have samples.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
+            self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'ui\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
+            self.volumes_label = '\n     Fill wells on the ethanol deep well plate corresponding\n     to those that have sample on the sample plate.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well'
             self.add_image(self.frame, self.image_name)
 
         else:
@@ -476,17 +489,17 @@ class Checkbox:
         # self.var1 = tk.IntVar()
         
         #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
-        self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh)
-        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=10, ipady=10, sticky=tk.W)
+        self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh, style='my.small.TButton')
+        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.W)
         
-        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
-        self.run_protocol_button.grid(row=20, column= 1, padx=20, pady=20, ipadx=10, ipady=10, sticky=tk.W)
+        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled', style='my.small.TButton')
+        self.run_protocol_button.grid(row=20, column= 1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.W)
         
         self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font).grid(row=10, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
-        self.volumes = ttk.Label(self.frame, text='\n     Ethanol:           ___ μl per well\n     Elution buffer: ___  μl per well', font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.volumes = ttk.Label(self.frame, text=self.volumes_label, font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
 
         self.connection_status = ttk.Label(self.frame, text='Check Connection', style='my.TLabel', foreground= 'green')
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
@@ -515,9 +528,10 @@ class Checkbox:
 
         self.connection_status.config(text='Checking connection...', foreground='black')
         self.connection_status.update()
-        host = 'localhost'
+        # host = 'localhost'
+        host = ip
         port = 22
-        self.ssh_conection = False
+
         try:
             test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             test_socket.connect((host, port))
@@ -528,7 +542,6 @@ class Checkbox:
             self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
         else:
             test_socket.close()
-            self.ssh_conection = True
             self.run_protocol_button.config(state=tk.NORMAL)
             self.connection_status.config(text='Connection OK', foreground='green')
             
@@ -555,7 +568,7 @@ class Checkbox:
         # Upload the new protocol using 
         # scp -i <key> <file_to_upload> <where_to_place_it>
         # Defines the multiprocess to be able to handle errors when transferring the protocol to the robot via SCP.
-        time_process = multiprocessing.Process(target=scp_transfer, name="SCP transfer")
+        time_process = multiprocessing.Process(target=scp_transfer(self.protocol), name="SCP transfer")
         time_process.start()
         time_process.join(5)
         # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
@@ -574,7 +587,7 @@ class Checkbox:
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_dna_name}\'')
+                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
             except:
                 messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')
             
@@ -608,8 +621,9 @@ def run_gui():
     root.mainloop()
 
 # Small function to enable multiprocessing later - used only for error-checking.
-def scp_transfer():
-    subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{protocol_dna_name} {username}@{ip}:{protocol_robot_filepath}{protocol_dna_name}')
+def scp_transfer(protocol):
+    test = f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{ip}:{protocol_robot_filepath}{protocol[1]}'
+    subprocess.run(f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{ip}:{protocol_robot_filepath}{protocol[1]}')
     return  
 
 # Main if-statement that runs the program.
