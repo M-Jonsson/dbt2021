@@ -26,6 +26,7 @@ protocol_qpcr_name = 'qpcr_output.py'
 
 font = (16)
 
+
 # Error check to see that the ssh_key is exists.
 if os.path.isfile(key_filename):
     print("ssh-key read successfully.")
@@ -44,15 +45,23 @@ class Selector():
         # Main frame for the protocol selection, to which all associated widgets are added
         self.frame = tk.Frame()
         self.frame.grid()
+        self.s = ttk.Style()
+        self.s.configure('my.TButton', font=('Helvetica', 12), background = 'grey')
+        self.s.configure('small.TButton', font=('Helvetica', 10), background = 'grey')
+        self.s.configure('my.TLabel', font =('Helvetica', 15))
+        self.s.configure('text.TLabel', font=('Helvetica', 10))
 
-        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol')
-        self.label_selection_info.grid(row=0, column=0, padx=10, pady=10)
+        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', style ='my.TLabel')
+        self.label_selection_info.grid(row=0, column=0, padx=20, pady=20)
 
-        self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads)
-        self.button_beads.grid(row=1, column=0, padx=10, pady=10)
+        self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads,style='my.TButton')
+        self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=1)
 
-        self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr)
-        self.button_qpcr.grid(row=1, column=1, padx=10, pady=10)
+        self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr,style='my.TButton')
+        self.button_qpcr.grid(row=1, column=1, padx=10, pady=10,ipadx=10, ipady=10)
+
+        self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
+        self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
         '''Closes the frame for protocol selection, but not the root window.
@@ -83,11 +92,11 @@ class Bead_protocol_config():
         self.frame.grid()
 
         # Labels
-        self.label_sample_no = ttk.Label(self.frame, text='How many samples:')
-        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample:')
-        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio:')
-        self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes:')
-        self.label_eb = ttk.Label(self.frame, text='Volume EB:')
+        self.label_sample_no = ttk.Label(self.frame, text='How many samples: \n(Valid values between 1-96 samples)', style='text.TLabel')
+        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample: \n(Valid values between 15-40 μl)', style='text.TLabel')
+        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio: \n(Valid ratios between 0.5-1.5)', style='text.TLabel')
+        self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes: ', style='text.TLabel')
+        self.label_eb = ttk.Label(self.frame, text='Volume Elution buffer: \n(Valid values between 15-25 μl)', style='text.TLabel')
 
         self.label_sample_no.grid(row=0, column=0, padx= 10, pady= 10, sticky=tk.W)
         self.label_sample_vol.grid(row=2, column=0, padx= 10, pady= 10, stick=tk.W)
@@ -115,19 +124,19 @@ class Bead_protocol_config():
         self.radio_ethanol2.grid(row=6, column=2,  padx=10, pady=10)
 
         # Buttons
-        self.button_ok = ttk.Button(self.frame, text='Ok', command=self.ok_button)
+        self.button_ok = ttk.Button(self.frame, text='Ok', command=self.ok_button, style='small.TButton')
         self.button_ok.grid(row=10, column=0, padx=10, pady=10)
 
-        self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button)
+        self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button, style='small.TButton')
         self.button_back.grid(row=10, column=2, padx=10, pady=10)
 
-        self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run, state=tk.DISABLED)
+        self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run,style='small.TButton', state=tk.DISABLED)
         self.button_start.grid(row=15, column=0, padx=10, pady=10)
 
-        self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
+        self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, style='small.TButton', state=tk.DISABLED)
         self.button_estimate.grid(row=15, column=1, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads, state=tk.DISABLED)
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads, style='small.TButton', state=tk.DISABLED)
         self.prepare_for_run.grid(row=15, column=2, padx=10, pady=10)
     
     def call_checkbox_beads(self):
@@ -157,7 +166,7 @@ class Bead_protocol_config():
             
             self.sample_vol = float(self.entry_sample_vol.get())
             if self.sample_vol <= 14.5 or self.sample_vol > 40:
-                messagebox.showerror('Notice', 'Volume amount is too low or too high, choose a volume between 15-40µl')
+                messagebox.showerror('Notice', 'Volume amount is too low or too high, choose a volume between 15-40 µl')
                 self.correct_sample_vol = False
             else:
                 self.correct_sample_vol = True
@@ -178,7 +187,7 @@ class Bead_protocol_config():
 
             self.eb = float(self.entry_eb.get())
             if self.eb < 15 or self.eb > 25:
-                messagebox.showerror('Notice', 'EB volume is too low or too high, choose an EB volume between 15-25µl')
+                messagebox.showerror('Notice', 'EB volume is too low or too high, choose an EB volume between 15-25 µl')
                 self.correct_eb = False
             else:
                 self.correct_eb = True
@@ -269,25 +278,28 @@ class qPCR_protocol_config():
         self.frame = tk.Frame()
         self.frame.grid()
 
-        self.file_label = ttk.Label(self.frame, text='File:')
+        self.file_label = ttk.Label(self.frame, text='File:', style='my.TLabel')
         self.file_label.grid(row=0, column=0, columnspan=3, padx=10, pady=3, sticky=tk.W)
 
-        self.file_name_label = ttk.Label(self.frame, text='No file chosen', foreground='red')
+        self.file_name_label = ttk.Label(self.frame, text='No file chosen', foreground='red', style='my.TLabel')
         self.file_name_label.grid(row=1, column=0, columnspan=3, padx=10, pady=0, sticky=tk.W)
 
-        self.open_file_dialog_button = ttk.Button(self.frame, text='Choose a file', command=self.open_file_dialog)
-        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10)
+        self.open_file_dialog_button = ttk.Button(self.frame, text='Choose a file', command=self.open_file_dialog, style='my.TButton')
+        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10, ipadx=10)
 
-        self.button_back = ttk.Button(self.frame, text='Back', command=self.back)
+        self.button_back = ttk.Button(self.frame, text='Back', command=self.back, style='my.TButton')
         self.button_back.grid(row=5, column=2, padx=10, pady=10)
 
-        self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
+        self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED, style='my.TButton')
         self.start_button.grid(row=5, column=1, padx=10, pady=10)
         
-        self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED)
+        self.grid_button = ttk.Button(self.frame, text='Tube Rack Layout', command=self.layout_grid, state=tk.DISABLED, style='my.TButton')
+        self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
+        
+        self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED, style='my.TButton')
         self.estimate_button.grid(row=10, column=1, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, state=tk.DISABLED)
+        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, style='my.TButton')
         self.prepare_for_run.grid(row=10, column=2, padx=10, pady=10)
 
         self._sources = None # klassvariabel som sparar dictionary med sources
@@ -465,18 +477,18 @@ class Checkbox:
         
         #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
         self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh)
-        self.connection_button.grid(row=3, column=1, padx=10, pady=10, sticky=tk.W)
+        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=10, ipady=10, sticky=tk.W)
         
-        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state=tk.DISABLED)
-        self.run_protocol_button.grid(row=20, column= 1, padx=20, pady=20, sticky=tk.W)
+        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled')
+        self.run_protocol_button.grid(row=20, column= 1, padx=20, pady=20, ipadx=10, ipady=10, sticky=tk.W)
         
         self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font).grid(row=10, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
-        self.volumes = ttk.Label(self.frame, text='\n     Ethanol: ___ ul per well\n     EB: ___ ul per well', font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.volumes = ttk.Label(self.frame, text='\n     Ethanol:           ___ μl per well\n     Elution buffer: ___  μl per well', font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
-        self.connection_status = ttk.Label(self.frame, text=' ', font=font)
+        self.connection_status = ttk.Label(self.frame, text='Check Connection', style='my.TLabel', foreground= 'green')
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
 
     def add_image(self, parent, image_path):
