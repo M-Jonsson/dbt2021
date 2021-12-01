@@ -47,9 +47,9 @@ class Selector():
         self.frame.grid()
         self.s = ttk.Style()
         self.s.configure('my.TButton', font=('Helvetica', 12), background = 'grey')
-        self.s.configure('small.TButton', font=('Helvetica', 10), background = 'grey')
+        self.s.configure('small.TButton', font=('Helvetica', 12), background = 'grey')
         self.s.configure('my.TLabel', font =('Helvetica', 15))
-        self.s.configure('text.TLabel', font=('Helvetica', 10))
+        self.s.configure('text.TLabel', font=('Helvetica', 11))
 
         self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', style ='my.TLabel')
         self.label_selection_info.grid(row=0, column=0, padx=20, pady=20)
@@ -611,7 +611,6 @@ class Checkbox:
 def run_gui():
     # Creates a root window
     root = tk.Tk()
-    #root.geometry('400x200+50+50')
     root.title('Protocol Selector')
 
     # Creates a frame for the root window with widgets for protocol selection. 
