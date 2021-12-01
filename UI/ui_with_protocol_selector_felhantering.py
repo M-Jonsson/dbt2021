@@ -30,9 +30,9 @@ font = (16)
 # Error check to see that the ssh_key is exists.
 if os.path.isfile(key_filename):
     print("ssh-key read successfully.")
-else:
-    messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
-    sys.exit(0)
+#else:
+    #messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
+    #sys.exit(0)
 
 
 class Selector():
@@ -93,10 +93,10 @@ class Bead_protocol_config():
 
         # Labels
         self.label_sample_no = ttk.Label(self.frame, text='How many samples: \n(Valid values between 1-96 samples)', style='text.TLabel')
-        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample: \n(Valid values between 15-40 μl)', style='text.TLabel')
-        self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio: \n(Valid ratios between 0.5-1.5)', style='text.TLabel')
+        self.label_sample_vol = ttk.Label(self.frame, text='Sample Volume: \n(Valid values between 15-40 μl)', style='text.TLabel')
+        self.label_bead_ratio = ttk.Label(self.frame, text='Bead/Sample ratio: \n(Valid ratios between 0.5-1.5)', style='text.TLabel')
         self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes: ', style='text.TLabel')
-        self.label_eb = ttk.Label(self.frame, text='Volume Elution buffer: \n(Valid values between 15-25 μl)', style='text.TLabel')
+        self.label_eb = ttk.Label(self.frame, text='Elution buffer Volume: \n(Valid values between 15-25 μl)', style='text.TLabel')
 
         self.label_sample_no.grid(row=0, column=0, padx= 10, pady= 10, sticky=tk.W)
         self.label_sample_vol.grid(row=2, column=0, padx= 10, pady= 10, stick=tk.W)
@@ -290,7 +290,7 @@ class qPCR_protocol_config():
         self.file_name_label.grid(row=1, column=0, columnspan=3, padx=10, pady=0, sticky=tk.W)
 
         self.open_file_dialog_button = ttk.Button(self.frame, text='Choose a file', command=self.open_file_dialog, style='my.TButton')
-        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10, ipadx=10)
+        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10, ipadx=0)
 
         self.button_back = ttk.Button(self.frame, text='Back', command=self.back, style='my.TButton')
         self.button_back.grid(row=5, column=2, padx=10, pady=10)
@@ -472,13 +472,13 @@ class Checkbox:
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'ui\\deck_96.gif'
+            self.image_name = 'deck_96.gif' # 'ui\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Fill wells on the ethanol deep well plate\n     correspoinding to those that have samples.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'ui\\deck_less_8.gif'
+            self.image_name = 'deck_less_8.gif' # 'ui\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Fill wells on the ethanol deep well plate corresponding\n     to those that have sample on the sample plate.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well'
             self.add_image(self.frame, self.image_name)
@@ -489,20 +489,20 @@ class Checkbox:
         # self.var1 = tk.IntVar()
         
         #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
-        self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh, style='my.small.TButton')
-        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.W)
+        self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh, style='small.TButton')
+        self.connection_button.grid(row=2, column=1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.W)
         
-        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled', style='my.small.TButton')
+        self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled', style='small.TButton')
         self.run_protocol_button.grid(row=20, column= 1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.W)
         
-        self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
-        self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
-        self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font).grid(row=10, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', style='text.TLabel').grid(row=1, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, style='text.TLabel').grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', style='text.TLabel').grid(row=6, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
-        self.volumes = ttk.Label(self.frame, text=self.volumes_label, font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
+        self.volumes = ttk.Label(self.frame, text=self.volumes_label, style='text.TLabel').grid(row=7, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
 
         self.connection_status = ttk.Label(self.frame, text='Check Connection', style='my.TLabel', foreground= 'green')
-        self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
+        self.connection_status.grid(row=2, column=2, sticky=tk.W, padx=20, pady=20)
 
     def add_image(self, parent, image_path):
         self.image = tk.PhotoImage(file=image_path)
@@ -517,7 +517,7 @@ class Checkbox:
         base = Tube_rack_base(self.frame_tube_racks)
 
         self.deck_tab = base.new_tab('Deck')
-        self.add_image(self.deck_tab, 'qpcr\\test.gif')
+        self.add_image(self.deck_tab, 'test.gif') #'qpcr\\test.gif'
 
         base.fill_notebook(sources, destinations)
 
@@ -611,12 +611,11 @@ class Checkbox:
 def run_gui():
     # Creates a root window
     root = tk.Tk()
-    root.title('Protocol selector test')
+    #root.geometry('400x200+50+50')
+    root.title('Protocol Selector')
 
     # Creates a frame for the root window with widgets for protocol selection. 
     Selector()
-    #Checkbox('qpcr_output.py')
-    #Checkbox('dna_cleaning_output.py')
 
     root.mainloop()
 
