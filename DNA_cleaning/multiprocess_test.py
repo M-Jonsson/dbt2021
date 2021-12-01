@@ -9,12 +9,14 @@ metadata = {'apiLevel': '2.10'}
 
 protocol = protocol_api.ProtocolContext
 
-
 def run(protocol):
     global paused
     paused = False
-    pool = ThreadPool()
+    global j
+    pool = ThreadPool(1)
     pool.apply_async(check_pause)
+
+    print(pool)
     
 
     resevoir = protocol.load_labware('usascientific_96_wellplate_2.4ml_deep',2) #Contains Magnetic Beads on A1 and EB on A3.
@@ -32,10 +34,12 @@ def run(protocol):
     #     paused = False
     #     time.sleep(0.5)
 
-    protocol.pause()
+    # protocol.pause()
     for i in range(1,4):
-        print(i)
 
+
+        
+        j = i
         p300.pick_up_tip()
         time.sleep(0.5)
         p300.transfer(50, resevoir['A'+str(i)], resevoir['A'+str(i+6)], new_tip='never')
@@ -47,17 +51,20 @@ def run(protocol):
 
         if i == 2:
             paused = True
-            protocol.pause()
+            protocol.delay(minutes=2)
+        paused = False
 
 def check_pause():
     while True:
         print('* * * * * * * *' + str(paused))
         
-        if paused:
-            print('*** PROTOCOL IS PAUSED ***')
-            protocol.resume()
-        else:
-            print('*** PROTOCOL IS RUNNING ***')
+        # if paused:
+        #     print('*** PROTOCOL IS PAUSED ***')
+        #     protocol.resume()
+        # else:
+        #     print('*** PROTOCOL IS RUNNING ***')
 
         time.sleep(0.1)
-        
+        print(j)
+
+# run()
