@@ -280,20 +280,21 @@ class Bead_protocol_config():
 
 class qPCR_protocol_config():
     def __init__(self):
-        self.frame = tk.Frame()
+        self.frame = tk.Frame(width=290, height=160)
         self.frame.grid()
+        self.frame.grid_propagate(0)
 
         self.file_label = ttk.Label(self.frame, text='File:', style='my.TLabel')
         self.file_label.grid(row=0, column=0, columnspan=3, padx=10, pady=3, sticky=tk.W)
 
         self.file_name_label = ttk.Label(self.frame, text='No file chosen', foreground='red', style='my.TLabel')
-        self.file_name_label.grid(row=1, column=0, columnspan=3, padx=10, pady=0, sticky=tk.W)
+        self.file_name_label.grid(row=1, column=0, columnspan=10, padx=10, pady=0, sticky=tk.W)
 
         self.open_file_dialog_button = ttk.Button(self.frame, text='Choose a file', command=self.open_file_dialog, style='my.TButton')
-        self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10, ipadx=0)
+        self.open_file_dialog_button.grid(row=2, column=0, padx=10, pady=10, ipadx=0, sticky=tk.W)
 
         self.button_back = ttk.Button(self.frame, text='Back', command=self.back, style='my.TButton')
-        self.button_back.grid(row=5, column=2, padx=10, pady=10)
+        self.button_back.grid(row=2, column=1, padx=10, pady=10, sticky=tk.W)
 
         # self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED, style='my.TButton')
         # self.start_button.grid(row=5, column=1, padx=10, pady=10)
@@ -302,10 +303,10 @@ class qPCR_protocol_config():
         # self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
         
         self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED, style='my.TButton')
-        self.estimate_button.grid(row=10, column=0, padx=10, pady=10)
+        self.estimate_button.grid(row=3, column=0, padx=10, pady=10, sticky=tk.W)
 
         self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, state=tk.DISABLED, style='my.TButton')
-        self.prepare_for_run.grid(row=10, column=2, padx=10, pady=10)
+        self.prepare_for_run.grid(row=3, column=1, padx=10, pady=10, sticky=tk.W)
 
         self._sources = None # klassvariabel som sparar dictionary med sources
     
