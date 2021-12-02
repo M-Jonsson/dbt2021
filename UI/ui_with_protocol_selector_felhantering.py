@@ -473,13 +473,13 @@ class Checkbox:
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'deck_96.gif' # 'ui\\deck_96.gif'
+            self.image_name = 'ui\\deck_96.gif' # 'ui\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Fill wells on the ethanol deep well plate\n     correspoinding to those that have samples.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'deck_less_8.gif' # 'ui\\deck_less_8.gif'
+            self.image_name = 'ui\\deck_less_8.gif' # 'ui\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Fill wells on the ethanol deep well plate corresponding\n     to those that have sample on the sample plate.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well'
             self.add_image(self.frame, self.image_name)
@@ -518,7 +518,7 @@ class Checkbox:
         base = Tube_rack_base(self.frame_tube_racks)
 
         self.deck_tab = base.new_tab('Deck')
-        self.add_image(self.deck_tab, 'test.gif') #'qpcr\\test.gif'
+        self.add_image(self.deck_tab, 'qpcr\\test.gif') #'qpcr\\test.gif'
 
         base.fill_notebook(sources, destinations)
 
