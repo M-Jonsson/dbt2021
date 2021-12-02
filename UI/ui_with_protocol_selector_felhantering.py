@@ -1,3 +1,21 @@
+####################################
+#   #fitting short description of the GUI goes here
+#
+#   Authors: Group 5 Design-Build-Test 2021:
+#           Elsa Renström    
+#           Agata Jasna
+#           Tiam Fitoon
+#           Mathias Jonsson
+#           Johan Lehto
+#           Johan Lundberg 
+#      
+#   Version information:
+#           v1.0 2021-12-XX: First public version.
+#
+####################################
+
+
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -30,16 +48,18 @@ font = (16)
 # Error check to see that the ssh_key is exists.
 if os.path.isfile(key_filename):
     print("ssh-key read successfully.")
-#else:
-    #messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
-    #sys.exit(0)
+else:
+    messagebox.showerror('File not found error!', f'SSH Key could not be read. Please check the filepath: {key_filename} and confirm it is placed there')
+    sys.exit(0)
 
 
 class Selector():
-    ''' Contains a frame with widgets used to select which protocol to edit.
+    """
+    Creates a frame with widgets used to select which protocol to run.
     The frame will be added to the root window when initialized and destroyed (closed)
     when another class containing a new frame is called. 
-    '''
+
+    """
 
     def __init__(self):
         # Main frame for the protocol selection, to which all associated widgets are added
@@ -64,27 +84,44 @@ class Selector():
         # self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
-        '''Closes the frame for protocol selection, but not the root window.
-        Then creates a new frame from Bead_protocol_config() for editing a magnetic bead DNA purification protocol.
-        '''
+        """
+        Closes the frame created by the Selector() class, but not the root window.
+        Then creates a new frame from the Bead_protocol_config() class for editing a 
+        magnetic bead DNA purification protocol.
+
+            Parameters:
+                Self:           what do you call this
+
+            Returns:
+                Nothing
+        """
 
         self.frame.destroy()
         Bead_protocol_config()
 
     def select_protocol_qpcr(self):
-        '''Closes the frame for protocol selection, but not the root window.
-        Then creates a new frame from qPCR_protocol_config() for editing a qPCR protocol.
-        '''
+        """
+        Closes the frame created by the Selector() class, but not the root window.
+        Then creates a new frame from the qPCR_protocol_config() class for editing a 
+        magnetic bead DNA purification protocol.
+
+            Parameters:
+                Self:           what do you call this
+
+            Returns:
+                Nothing
+        """
 
         self.frame.destroy()
         qPCR_protocol_config()
 
 class Bead_protocol_config():
-    '''Contains a frame with widgets used configure a magnetic bead DNA purification protocol.
-    The frame will be added to the root window when initialized and destroyed (closed)
-    when another class containing a new frame is called.
-    Allows for uploading and launching the finished protocol. 
-    '''
+    """
+    Creates a frame containing widgets used to configure a magnetic bead DNA purification protocol.
+    The frame will be added to the root window when initialized and destroyed (closed) when another 
+    class containing a new frame is called. 
+
+    """
 
     def __init__(self):
         # Main frame for the protocol editing, to which all associated widgets are added
@@ -140,19 +177,35 @@ class Bead_protocol_config():
         self.prepare_for_run.grid(row=15, column=1, padx=10, pady=10)
     
     def call_checkbox_beads(self):
-        '''The purpuse of this function is to call the Checkbox() class, it checks the number of samples and uses
-        deck_less_8.gif is the sample number is <8, otherwise it uses dec_96.gif'''
+        """
+        The purpuse of this function is to call the Checkbox() class, it checks the number of samples 
+        and uses deck_less_8.gif if the sample number is less than 8, otherwise it uses deck_96.gif.
+
+            Parameters:
+                Self:           what do you call this
+
+            Returns:
+                Nothing
+
+        """
 
         self.window = tk.Toplevel()
         sample_no = int(self.entry_sample_no.get())
         Checkbox(parent=self.window, protocol_type=protocol_dna_name, num_samples=sample_no)
  
     def ok_button(self):
-        ''' Checks if all entries are valid.
+        """ 
+        Checks if all entries are valid.
         If valid, will create a modified protocol with the value given by the user 
-        (done by replace_values() to edit an existing protocol blueprint).
-        Finally uploads the new protocol to the robot and launches it.
-        '''
+        (done by the replace_values() function to edit an existing protocol blueprint).
+
+            Parameters:
+                Self:           what do you call this
+
+            Returns:
+                Nothing
+
+        """
 
         try:
         # Gets values from corresponding entry and checks if it is within the allowed range
@@ -265,16 +318,34 @@ class Bead_protocol_config():
 
 
     def get_estimate(self):
-        '''Simulates the protocol using opentrons_simulate.exe
+        """
+        Simulates the protocol using the opentrons_simulate.exe command
         with the experimental time estimate feature enabled (-e flag).
-        Shows the result in an message box. 
-        '''
+        Shows the result in an message box.
+
+            Parameters:
+                Self:           what do you call this
+
+            Returns:
+                Nothing 
+
+        """
         run = subprocess.run(f"opentrons_simulate.exe -e {protocol_local_filepath}{protocol_dna_name}", capture_output=True, text=True)
         self.beads_estimate = run.stdout.split('\n')[-4]
         messagebox.showinfo('Protocol estimate', f'{self.beads_estimate}')
     
     def back_button(self):
-        '''Closes the frame for protocol editing and replaces it with a frame for protocol selection.'''
+        """
+        Closes the frame for protocol editing and replaces it with a frame for protocol selection
+        by calling the Selectro() class.
+
+            Parameters:
+                Self:           what do you call this
+
+            Returns:
+                Nothing 
+
+        """
         self.frame.destroy()
         Selector()
 
