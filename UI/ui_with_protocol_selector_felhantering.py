@@ -53,8 +53,8 @@ class Selector():
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr,style='my.TButton')
         self.button_qpcr.grid(row=1, column=1, padx=10, pady=10, ipadx=10, ipady=10)
 
-        # self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
-        # self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
+        self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
+        self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
         '''Closes the frame for protocol selection, but not the root window.
@@ -71,6 +71,12 @@ class Selector():
 
         self.frame.destroy()
         qPCR_protocol_config()
+
+    def test(self):
+        test_protocol = 'multiprocess_test.py'
+        subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{test_protocol} {username}@{ip}:{protocol_robot_filepath}{test_protocol}')
+        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{test_protocol}\'')
+        
 
 class Bead_protocol_config():
     '''Contains a frame with widgets used configure a magnetic bead DNA purification protocol.
