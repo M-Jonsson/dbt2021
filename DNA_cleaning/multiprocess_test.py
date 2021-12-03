@@ -1,70 +1,86 @@
+# Shut off robot server to enable GPIO
+# Required to monitor door state and control lights.
+
+import os
+
+os.system("systemctl stop opentrons-robot-server")
+
 from opentrons import protocol_api
 import math
 import time
-import multiprocessing
-from multiprocessing.pool import ThreadPool
-import queue
+import threading
 
 metadata = {'apiLevel': '2.10'}
 
-protocol = protocol_api.ProtocolContext
+# global protocol
+# protocol = protocol_api.ProtocolContext
 
-def run(protocol):
+# global paused
+# paused = False
+
+# paused = multiprocessing.Value('i', 0)
+# print(paused)
+# print(paused.value)
+
+
+
+
+
+def run(protocol: protocol_api.ProtocolContext):
+    protocol.set_rail_lights(True)
+    print('DOOR STATE = ' + str(protocol.door_closed))
+
     global paused
     paused = False
-    global j
-    pool = ThreadPool(1)
-    pool.apply_async(check_pause)
 
-    print(pool)
-    
+    global done
+    done = False
 
-    resevoir = protocol.load_labware('usascientific_96_wellplate_2.4ml_deep',2) #Contains Magnetic Beads on A1 and EB on A3.
-    tiprack_7 = protocol.load_labware('opentrons_96_tiprack_300ul', 7)
+    def check_pause():
+        global paused
+        global done
+        if not paused and not protocol.door_closed:
+            protocol.pause()
+            paused = True
+        
+        if paused and protocol.door_closed:
+            protocol.resume()
+            paused = False
+
+        print(str(protocol.door_closed))
+        time.sleep(1)
+        print('a')
+        if not done:
+            print('b')
+            check_pause()
+
+    # queue = multiprocessing.Queue()
+    thread = threading.Thread(target=check_pause)
+    thread.start()
+    # process = threading.start_new_thread(target=check_pause)
+    # process.start()
+    # process.join()
+
+    resevoir = protocol.load_labware('usascientific_96_wellplate_2.4ml_deep',8) #Contains Magnetic Beads on A1 and EB on A3.
+    tiprack_7 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p300 = protocol.load_instrument('p300_multi', 'right', tip_racks=[tiprack_7])
 
+    print('DOOR STATE = ' + str(protocol.door_closed))
 
-    # for i in range(1,7):
-    #     p300.pick_up_tip()
-    #     p300.transfer(50, resevoir['A'+str(i)], resevoir['A'+str(i+6)], new_tip='never')
-    #     p300.drop_tip()
-    #     paused = True
-    #     time.sleep(1)
-    #     protocol.delay(seconds=30)
-    #     paused = False
-    #     time.sleep(0.5)
-
-    # protocol.pause()
-    for i in range(1,4):
-
-
-        
-        j = i
+    for i in range(1,2):
+        print('DOOR STATE = ' + str(protocol.door_closed))
         p300.pick_up_tip()
-        time.sleep(0.5)
-        p300.transfer(50, resevoir['A'+str(i)], resevoir['A'+str(i+6)], new_tip='never')
-        time.sleep(1)
+        p300.aspirate(200, resevoir['A1'], rate=1)
+        # p300.transfer(50, resevoir['A'+str(i)], resevoir['A'+str(i+6)], new_tip='never')
         p300.drop_tip()
-        time.sleep(0.5)
 
-        
 
-        if i == 2:
-            paused = True
-            protocol.delay(minutes=2)
-        paused = False
+    done = True
+    print('first done')
+    time.sleep(3)
+    print('pre join')
+    thread.join()
+    print('post join')
 
-def check_pause():
-    while True:
-        print('* * * * * * * *' + str(paused))
-        
-        # if paused:
-        #     print('*** PROTOCOL IS PAUSED ***')
-        #     protocol.resume()
-        # else:
-        #     print('*** PROTOCOL IS RUNNING ***')
-
-        time.sleep(0.1)
-        print(j)
-
-# run()
+    os.system("systemctl start opentrons-robot-server")
+    print('done')
