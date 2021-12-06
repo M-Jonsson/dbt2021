@@ -637,6 +637,7 @@ class Threaded_ssh_check(multiprocessing.Process):
         super().__init__()
         self.queue = queue
     
+
     def run(self):
         # host = 'localhost'
         host = ip
@@ -674,9 +675,9 @@ def run_gui():
         # Error check to see that the ssh_key is exists.
     if os.path.isfile(key_filename):
         print("ssh-key read successfully.")
-    else:
-        messagebox.showerror('File not found error!', f'SSH Key could not be found. Please check the filepath: {key_filename} and confirm it is placed there')
-        sys.exit(0)
+    #else:
+        #messagebox.showerror('File not found error!', f'SSH Key could not be found. Please check the filepath: {key_filename} and confirm it is placed there')
+        #sys.exit(0)
 
     root.mainloop()
 
