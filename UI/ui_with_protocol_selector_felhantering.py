@@ -13,6 +13,9 @@ import time
 import multiprocessing
 import queue
 import socket
+import math
+
+
 
 # Files and logins for SSH and SCP
 local_user = getlogin() # os.getlogin() get username on local machine
@@ -44,8 +47,8 @@ class Selector():
         self.s.configure('my.TLabel', font =('Helvetica', 15))
         self.s.configure('text.TLabel', font=('Helvetica', 10))
 
-        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', style ='my.TLabel')
-        self.label_selection_info.grid(row=0, column=0, padx=20, pady=20)
+        self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', style ='my.TLabel', anchor="e", justify="right")
+        self.label_selection_info.grid(row=0,column=0,columnspan=2, padx=20, pady=20)
 
         self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads,style='my.TButton')
         self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=1)
@@ -53,8 +56,8 @@ class Selector():
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr,style='my.TButton')
         self.button_qpcr.grid(row=1, column=1, padx=10, pady=10, ipadx=10, ipady=10)
 
-        self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
-        self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
+        #self.button_test = ttk.Button(self.frame, text='Test', command=self.test,style='my.TButton')
+        #self.button_test.grid(row=1, column=2, padx=10, pady=10,ipadx=10, ipady=10)
 
     def select_protocol_beads(self):
         '''Closes the frame for protocol selection, but not the root window.
@@ -91,11 +94,11 @@ class Bead_protocol_config():
         self.frame.grid()
 
         # Labels
-        self.label_sample_no = ttk.Label(self.frame, text='How many samples: \n(Valid values between 1-96 samples)', style='text.TLabel')
-        self.label_sample_vol = ttk.Label(self.frame, text='Volume sample: \n(Valid values between 15-40 μl)', style='text.TLabel')
+        self.label_sample_no = ttk.Label(self.frame, text='Number of samples: \n(Valid values between 1-96 samples)', style='text.TLabel')
+        self.label_sample_vol = ttk.Label(self.frame, text='Sample volume: \n(Valid values between 15-40 μl)', style='text.TLabel')
         self.label_bead_ratio = ttk.Label(self.frame, text='Bead:Sample ratio: \n(Valid ratios between 0.5-1.5)', style='text.TLabel')
         self.label_ethanol = ttk.Label(self.frame, text='Number of ethanol washes: ', style='text.TLabel')
-        self.label_eb = ttk.Label(self.frame, text='Volume Elution buffer: \n(Valid values between 15-25 μl)', style='text.TLabel')
+        self.label_eb = ttk.Label(self.frame, text='Elution buffer volume: \n(Valid values between 15-25 μl)', style='text.TLabel')
 
         self.label_sample_no.grid(row=0, column=0, padx= 10, pady= 10, sticky=tk.W)
         self.label_sample_vol.grid(row=2, column=0, padx= 10, pady= 10, stick=tk.W)
@@ -144,7 +147,11 @@ class Bead_protocol_config():
 
         self.window = tk.Toplevel()
         sample_no = int(self.entry_sample_no.get())
-        Checkbox(parent=self.window, protocol_type=protocol_dna_name, num_samples=sample_no)
+        sample_vol = float(self.entry_sample_vol.get())
+        ratio = float(self.entry_bead_ratio.get())
+        EB=float(self.entry_eb.get()) 
+        etoh=self.ethanol_var.get()
+        Checkbox(parent=self.window, protocol_type=protocol_dna_name, num_samples=sample_no, sample_vol=sample_vol, ratio=ratio, EB=EB, etoh=etoh)
  
     def ok_button(self):
         ''' Checks if all entries are valid.
@@ -220,6 +227,7 @@ class Bead_protocol_config():
 
         except ValueError:
             messagebox.showerror('Notice', 'You did not enter valid numbers')
+
 
     # Should not be needed
     # Protocol is started from checklist
@@ -458,7 +466,15 @@ class Tube_rack_grid():
 
 class Checkbox:
     '''Checkbox class containing checkboxes and other stuff. very bare bones at the moment'''
-    def __init__(self, parent, protocol_type: str, num_samples=None):
+    def __init__(self, parent, protocol_type: str, num_samples=None, sample_vol=None, ratio=None, EB=None, etoh=None):
+        
+        columns=math.ceil(num_samples/8)
+        beads=sample_vol*ratio*columns+60
+
+        vol_eb=EB*columns+60
+
+        vol_etoh=etoh*200+100
+
         self.parent = parent
         self.frame = ttk.Frame(self.parent)
         self.frame.pack()
@@ -473,13 +489,13 @@ class Checkbox:
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'ui\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     Fill wells on the ethanol deep well plate\n     corresponding to those that have samples.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well\n          SPRI beads: ____ µl per well'
+            self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'ui\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     Fill wells on the ethanol deep well plate \n     corresponding to those that have samples.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well\n          SPRI beads: ____ µl per well'
+            self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
             self.add_image(self.frame, self.image_name)
 
         else:
@@ -489,10 +505,10 @@ class Checkbox:
         
         #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
         self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh, style='my.small.TButton')
-        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.W)
+        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
         
         self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled', style='my.small.TButton')
-        self.run_protocol_button.grid(row=20, column= 1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.W)
+        self.run_protocol_button.grid(row=20, column= 2, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
         
         self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
@@ -500,7 +516,7 @@ class Checkbox:
 
         self.volumes = ttk.Label(self.frame, text=self.volumes_label, font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
 
-        self.connection_status = ttk.Label(self.frame, text='Check Connection', style='my.TLabel', foreground= 'green')
+        self.connection_status = ttk.Label(self.frame, text='   Check Connection', style='my.TLabel', foreground= 'green')
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
 
     def add_image(self, parent, image_path):
@@ -532,7 +548,7 @@ class Checkbox:
         If not, checks again in 3 seconds. 
         '''
 
-        self.connection_status.config(text='Checking connection...', foreground='black')
+        self.connection_status.config(text='      Checking connection...', foreground='black')
         self.connection_status.update()
         
         self.valid_connection = False
@@ -665,7 +681,7 @@ class Threaded_ssh_check(multiprocessing.Process):
 def run_gui():
     # Creates a root window
     root = tk.Tk()
-    root.title('Protocol selector test')
+    root.title('Protocol selector')
 
     # Creates a frame for the root window with widgets for protocol selection. 
     Selector()
