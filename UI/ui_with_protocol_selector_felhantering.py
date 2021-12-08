@@ -497,7 +497,6 @@ class Checkbox:
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
             self.add_image(self.frame, self.image_name)
-
         else:
             messagebox.showerror('Error', f"Invalid protocol type '{self.protocol_type}' entered.")
     
@@ -627,9 +626,14 @@ class Checkbox:
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
+                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
+                print(log)
+                if 'Protocol Complete' in log:
+                    tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
+                else:
+                    tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.')
             except:
-                messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')
+                messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')      
             
 
         # Beads methods should also work for qPCR
