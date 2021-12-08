@@ -12,10 +12,10 @@ def replace_values(sample_no, sample_vol, ratio, clean_amt, eb_vol):
 
     local_user = os.getlogin()
     if sample_no < 8:
-        file_in = f'DNA_cleaning\\purify_less_than_8_modified.py'
+        file_in = f'..\\DNA_cleaning\\purify_less_than_8_modified.py'
     else:
-        file_in = f'DNA_cleaning\\dna_cleaning_blueprint.py'
-    file_out = f'c:DNA_cleaning\\dna_cleaning_output.py'
+        file_in = f'..\\DNA_cleaning\\dna_cleaning_blueprint.py'
+    file_out = f'..\\DNA_cleaning\\dna_cleaning_output.py'
     
     copyfile(file_in, file_out)
     

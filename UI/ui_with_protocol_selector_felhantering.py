@@ -587,7 +587,7 @@ class Checkbox:
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_name}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
+                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
                 print(log)
                 if 'Protocol Complete' in log:
                     tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
