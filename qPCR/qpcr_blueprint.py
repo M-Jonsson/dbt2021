@@ -38,3 +38,6 @@ def run(protocol: protocol_api.ProtocolContext):
     for standard in standard_destination.keys():
         for well in standard_destination[standard]:
             p10.transfer(4, tube_rack[standard_source[standard][1]], well_plate[well])
+
+    print('Protocol Complete')
+    

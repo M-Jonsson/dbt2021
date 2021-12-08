@@ -246,6 +246,8 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.home()
     mag_deck.disengage()
 
+    print('Protocol Complete')
+
     ###########
     ### END ###
     ###########
