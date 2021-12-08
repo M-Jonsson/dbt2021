@@ -16,12 +16,12 @@ import socket
 # Files and logins for SSH and SCP
 local_user = getlogin() # os.getlogin() get username on local machine
 key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
-protocol_local_filepath = f'dna_cleaning\\'
+protocol_local_filepath = f'..\\dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
 protocol_dna_name = 'dna_cleaning_output.py'
 ip = '169.254.29.201'
 username = 'root'
-protocol_qpcr_local_filepath = f'qPCR\\'
+protocol_qpcr_local_filepath = f'..\\qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
 
 font = (16)
@@ -467,18 +467,18 @@ class Checkbox:
 
         if self.protocol_type.startswith('qpcr'): # qPCR protocol'
             self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
-            self.image_name = 'qPCR\\test.gif'
+            self.image_name = '..\\qPCR\\test.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'ui\\deck_96.gif'
+            self.image_name = '..\\ui\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Fill wells on the ethanol deep well plate\n     corresponding to those that have samples.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well\n          SPRI beads: __ µl per well'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'ui\\deck_less_8.gif'
+            self.image_name = '..\\ui\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Fill wells on the ethanol deep well plate \n     corresponding to those that have sample.\n          Ethanol:           200 + ??? extra μl per well\n          Elution buffer: ___  μl per well\n          SPRI beads: __ µl per well'
             self.add_image(self.frame, self.image_name)
@@ -517,7 +517,7 @@ class Checkbox:
         base = Tube_rack_base(self.frame_tube_racks)
 
         self.deck_tab = base.new_tab('Deck')
-        self.add_image(self.deck_tab, 'qpcr\\test.gif')
+        self.add_image(self.deck_tab, '..\\qpcr\\test.gif')
 
         base.fill_notebook(sources, destinations)
 
@@ -590,9 +590,9 @@ class Checkbox:
                 log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
                 print(log)
                 if 'Protocol Complete' in log:
-                    tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
+                    tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!', parent=self.frame)
                 else:
-                    tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.')
+                    tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.', parent=self.frame)
             except:
                 messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')      
             
