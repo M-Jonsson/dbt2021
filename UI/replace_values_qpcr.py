@@ -122,8 +122,8 @@ def replace_values_qpcr(destinations, sources):
     local_user = getlogin() # Used when specifiying filepaths
     all_wells = {**destinations, **sources} # Merge into 1 dicitonary for easy looping
     # Create a copy
-    file_in = f'qPCR\\qpcr_blueprint.py'
-    file_out = f'qPCR\\qpcr_output.py'
+    file_in = f'..\\qPCR\\qpcr_blueprint.py'
+    file_out = f'..\\qPCR\\qpcr_output.py'
     copyfile(file_in, file_out)
 
     # Appends well information in the format of 
