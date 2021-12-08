@@ -468,13 +468,6 @@ class Checkbox:
     '''Checkbox class containing checkboxes and other stuff. very bare bones at the moment'''
     def __init__(self, parent, protocol_type: str, num_samples=None, sample_vol=None, ratio=None, EB=None, etoh=None):
         
-        columns=math.ceil(num_samples/8)
-        beads=sample_vol*ratio*columns+60
-
-        vol_eb=EB*columns+60
-
-        vol_etoh=etoh*200+100
-
         self.parent = parent
         self.frame = ttk.Frame(self.parent)
         self.frame.pack()
@@ -486,12 +479,20 @@ class Checkbox:
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
+            columns=math.ceil(num_samples/8)
+            beads=sample_vol*ratio*columns+60
+            vol_eb=EB*columns+60
+            vol_etoh=etoh*200+100
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'ui\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
+            columns=math.ceil(num_samples/8)
+            beads=sample_vol*ratio*columns+60
+            vol_eb=EB*columns+60
+            vol_etoh=etoh*200+100
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'ui\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
