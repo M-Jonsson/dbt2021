@@ -472,7 +472,7 @@ class Checkbox:
 
         if self.protocol_type.startswith('qpcr'): # qPCR protocol'
             self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
-            self.image_name = '..\\Deck Images\\test.gif'
+            self.image_name = '..\\Deck Images\\deck_qpcr.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
