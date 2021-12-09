@@ -130,16 +130,13 @@ class Bead_protocol_config():
         self.button_ok.grid(row=10, column=0, padx=10, pady=10)
 
         self.button_back = ttk.Button(self.frame, text='Back', command=self.back_button, style='small.TButton')
-        self.button_back.grid(row=10, column=1, padx=10, pady=10)
-
-        # self.button_start = ttk.Button(self.frame, text='Start run', command=self.start_run,style='small.TButton', state=tk.DISABLED)
-        # self.button_start.grid(row=15, column=0, padx=10, pady=10)
+        self.button_back.grid(row=15, column=1, padx=10, pady=10)
 
         self.button_estimate = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, style='small.TButton', state=tk.DISABLED)
-        self.button_estimate.grid(row=15, column=0, padx=10, pady=10)
+        self.button_estimate.grid(row=10, column=1, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_beads, style='small.TButton', state=tk.DISABLED)
-        self.prepare_for_run.grid(row=15, column=1, padx=10, pady=10)
+        self.prepare_for_run = ttk.Button(self.frame, text='Next', command=self.call_checkbox_beads, style='small.TButton', state=tk.DISABLED)
+        self.prepare_for_run.grid(row=15, column=0, padx=10, pady=10)
     
     def call_checkbox_beads(self):
         '''The purpuse of this function is to call the Checkbox() class, it checks the number of samples and uses
@@ -300,7 +297,7 @@ class qPCR_protocol_config():
         self.open_file_dialog_button.grid(row=5, column=0, padx=10, pady=10, ipadx=10)
 
         self.button_back = ttk.Button(self.frame, text='Back', command=self.back, style='my.TButton')
-        self.button_back.grid(row=5, column=2, padx=10, pady=10)
+        self.button_back.grid(row=10, column=2, padx=10, pady=10)
 
         # self.start_button = ttk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED, style='my.TButton')
         # self.start_button.grid(row=5, column=1, padx=10, pady=10)
@@ -309,10 +306,10 @@ class qPCR_protocol_config():
         # self.grid_button.grid(row=10, column=0, padx=10, pady=10)        
         
         self.estimate_button = ttk.Button(self.frame, text='Estimate time', command=self.get_estimate, state=tk.DISABLED, style='my.TButton')
-        self.estimate_button.grid(row=10, column=0, padx=10, pady=10)
+        self.estimate_button.grid(row=5, column=2, padx=10, pady=10)
 
-        self.prepare_for_run = ttk.Button(self.frame, text='Prepare run', command=self.call_checkbox_qpcr, state=tk.DISABLED, style='my.TButton')
-        self.prepare_for_run.grid(row=10, column=2, padx=10, pady=10)
+        self.prepare_for_run = ttk.Button(self.frame, text='Next', command=self.call_checkbox_qpcr, state=tk.DISABLED, style='my.TButton')
+        self.prepare_for_run.grid(row=10, column=0, padx=10, pady=10)
 
         self._sources = None # klassvariabel som sparar dictionary med sources
     
