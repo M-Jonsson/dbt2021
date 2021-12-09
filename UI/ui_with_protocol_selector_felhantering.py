@@ -7,6 +7,7 @@ import replace_values
 import replace_values_qpcr
 import subprocess
 from os import getlogin
+import os
 import os.path
 import sys
 import time
@@ -23,7 +24,8 @@ key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
 protocol_local_filepath = f'dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
 protocol_dna_name = 'dna_cleaning_output.py'
-ip = '169.254.29.201'
+# ip = '169.254.99.249'
+ip = '169.254.29.201' #standard ip
 username = 'root'
 protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
@@ -624,8 +626,14 @@ class Checkbox:
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
+                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
+                # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
+                # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', capture_output=True, text=True)
+                # log = log.stdout.split('\n')
+                print('--------- printing log -----------------')
                 print(log)
+                print(log.stdout)
+                # print(log)
                 if 'Protocol Complete' in log:
                     tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
                 else:
@@ -681,6 +689,7 @@ class Threaded_ssh_check(multiprocessing.Process):
 
 
 def run_gui():
+    os.chdir('..\\')
     # Creates a root window
     root = tk.Tk()
     root.title('Protocol selector')
