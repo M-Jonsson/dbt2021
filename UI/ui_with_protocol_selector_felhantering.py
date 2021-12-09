@@ -529,7 +529,7 @@ class Checkbox:
         base = Tube_rack_base(self.frame_tube_racks)
 
         self.deck_tab = base.new_tab('Deck')
-        self.add_image(self.deck_tab, '..\\Deck Images\\test.gif')
+        self.add_image(self.deck_tab, '..\\Deck Images\\deck_qpcr.gif')
 
         base.fill_notebook(sources, destinations)
 
