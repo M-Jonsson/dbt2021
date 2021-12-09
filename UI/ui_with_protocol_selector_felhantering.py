@@ -20,12 +20,12 @@ import math
 # Files and logins for SSH and SCP
 local_user = getlogin() # os.getlogin() get username on local machine
 key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
-protocol_local_filepath = f'..\\dna_cleaning\\'
+protocol_local_filepath = f'dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
 protocol_dna_name = 'dna_cleaning_output.py'
 ip = '169.254.29.201'
 username = 'root'
-protocol_qpcr_local_filepath = f'..\\qPCR\\'
+protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
 
 font = (16)
@@ -472,7 +472,7 @@ class Checkbox:
 
         if self.protocol_type.startswith('qpcr'): # qPCR protocol'
             self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
-            self.image_name = '..\\Deck Images\\test.gif'
+            self.image_name = 'Deck Images\\test.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
@@ -481,7 +481,7 @@ class Checkbox:
             vol_eb=EB*columns+60
             vol_etoh=etoh*200+100
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = '..\\Deck Images\\deck_96.gif'
+            self.image_name = 'Deck Images\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
             self.add_image(self.frame, self.image_name)
@@ -491,7 +491,7 @@ class Checkbox:
             vol_eb=EB*columns+60
             vol_etoh=etoh*200+100
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = '..\\Deck Images\\deck_less_8.gif'
+            self.image_name = 'Deck Images\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
             self.add_image(self.frame, self.image_name)
@@ -529,7 +529,7 @@ class Checkbox:
         base = Tube_rack_base(self.frame_tube_racks)
 
         self.deck_tab = base.new_tab('Deck')
-        self.add_image(self.deck_tab, '..\\Deck Images\\test.gif')
+        self.add_image(self.deck_tab, 'Deck Images\\test.gif')
 
         base.fill_notebook(sources, destinations)
 
@@ -624,7 +624,7 @@ class Checkbox:
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
+                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute -L /data/user_storage/Custom_labware {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
                 print(log)
                 if 'Protocol Complete' in log:
                     tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
