@@ -78,7 +78,7 @@ class Selector():
     def test(self):
         test_protocol = 'multiprocess_test.py'
         subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{test_protocol} {username}@{ip}:{protocol_robot_filepath}{test_protocol}')
-        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{test_protocol}\'')
+        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'python -m opentrons.execute(protocol_file={protocol_robot_filepath}{test_protocol}, custom_labware_path=/data/user_storage\'')
         
 
 class Bead_protocol_config():
@@ -472,7 +472,7 @@ class Checkbox:
 
         if self.protocol_type.startswith('qpcr'): # qPCR protocol'
             self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
-            self.image_name = 'Deck Images\\test.gif'
+            self.image_name = 'Deck Images\\deck_qpcr.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
@@ -529,7 +529,7 @@ class Checkbox:
         base = Tube_rack_base(self.frame_tube_racks)
 
         self.deck_tab = base.new_tab('Deck')
-        self.add_image(self.deck_tab, 'Deck Images\\test.gif')
+        self.add_image(self.deck_tab, 'Deck Images\\deck_qpcr.gif')
 
         base.fill_notebook(sources, destinations)
 
