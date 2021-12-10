@@ -15,6 +15,7 @@
 ####################################
 
 from opentrons import protocol_api
+from opentrons.types import Point
 metadata = {'apiLevel': '2.10'}
 
 
@@ -184,11 +185,17 @@ def run(protocol: protocol_api.ProtocolContext):
     P300.pick_up()
     p300.flow_rate.aspirate = 9
     p300.flow_rate.dispense = 9        
-    custom_mix(p300, 15, 30, resevoir['A1'], 1.5, 3)
-    p300.flow_rate.aspirate = 60
-    p300.flow_rate.dispense = 60
-    p300.transfer(vol_beads, resevoir['A1'], sample_plate['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
-    custom_mix(p300, 15, vol_samples+vol_beads-5, sample_plate['A1'], 0.6, 3.5)
+    custom_mix(p300, 30, 15, resevoir['A1'], 3, 6)
+    p300.flow_rate.aspirate = 120
+    p300.flow_rate.dispense = 30
+    #p300.transfer(vol_beads, resevoir['A1'], sample_plate['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
+    p300.aspirate(vol_beads+10, resevoir['A1'].bottom(z=3))
+    p300.dispense(vol_beads, sample_plate['A1'].bottom(z=5))
+    p300.dispense(10, resevoir['A1'].bottom(z=20))
+    p300.blow_out(resevoir['A1'].bottom(z=20))
+    p300.flow_rate.aspirate=60
+    p300.flow_rate.dispense=60
+    custom_mix(p300, 15, vol_samples+vol_beads-10, sample_plate['A1'], 0.6, 3)
     p300.drop_tip()
     
     #Wait 5 min. Engage magnet. Wait 5 min.
@@ -197,22 +204,51 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.delay(minutes=5) #minutes=5
 
     #Remove liquid from sample.
+    v_tot = vol_beads + vol_samples
     P300.pick_up()
-    p300.flow_rate.aspirate = 15
-    p300.aspirate(vol_samples+vol_beads, sample_plate['A1'])
+    p300.flow_rate.aspirate = 90
+    p300.aspirate(v_tot/2 - 5, sample_plate['A1'].bottom(z=5))
+    p300.aspirate(v_tot/2 - 5, sample_plate['A1'].bottom(z=2))
+    
+    p300.aspirate(5, sample_plate['A1'].bottom(z=0.5))
+    p300.aspirate(5, sample_plate['A1'].bottom(z=0.2))
+    p300.aspirate(5, sample_plate['A1'].bottom(z=0.1))
+    p300.aspirate(5, sample_plate['A1'].bottom(z=0))
+    #p300.aspirate(vol_samples+vol_beads, sample_plate['A1'])
     p300.drop_tip()
     
     
     #Cleans the samples with EtOH.
     P300.pick_up()
     for i in range(1, cleanings + 1):
-        p300.flow_rate.aspirate = 30
+        p300.flow_rate.aspirate = 60
         p300.flow_rate.dispense = 30
-        p300.aspirate(200, resevoir['A' + str(4 + i)], 3) 
-        stepwise_dispense(p300, 200, sample_plate['A1'], 10)
+        p300.aspirate(190, resevoir['A' + str(4 + i)].bottom(z=3), 3) 
+        stepwise_dispense(p300, 190, sample_plate['A1'], 10)
         protocol.delay(seconds=30) #seconds=30
         p300.flow_rate.dispense = 150
-        p300.transfer(200, sample_plate['A1'], resevoir_trash['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
+        #p300.transfer(200, sample_plate['A1'], resevoir_trash['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
+        
+        #remove EtOH
+        p300.flow_rate.aspirate=90
+        p300.flow_rate.dispense=100
+        p300.pick_up_tip(tiprack_7.wells('A' + str(i))[0])
+        center_location = sample_plate['A' + str(i)].bottom(z=0.3)
+        center_location_higher = center_location.move(Point(0, 0, 1.2))
+        adjusted_location1 = center_location.move(Point(0.3, 0.3, 0.1))
+        adjusted_location2 = center_location.move(Point(-0.3, -0.3, 0.1))
+
+        p300.aspirate(150, center_location_higher)
+        p300.aspirate(30, center_location)
+        p300.aspirate(20, adjusted_location1)
+        p300.aspirate(20, adjusted_location2)
+
+        p300.dispense(220, resevoir_trash['A' + str(i)].bottom(z=3))
+            
+        if i < cleanings:
+            p300.return_tip()
+        elif i == cleanings:
+            p300.drop_tip() 
     p300.drop_tip()
     
     
@@ -223,10 +259,17 @@ def run(protocol: protocol_api.ProtocolContext):
 
     #Add EB and mix.
     P300.pick_up()
-    p300.flow_rate.aspirate = 60
-    p300.flow_rate.dispense = 60    
-    p300.transfer(vol_EB, resevoir['A3'], sample_plate['A1'], new_tip ='never')
-    custom_mix(p300, 15, vol_EB-3, sample_plate['A1'], 0.6, 1.5)
+    p300.flow_rate.aspirate = 120
+    p300.flow_rate.dispense = 120    
+    #p300.transfer(vol_EB, resevoir['A3'], sample_plate['A1'], new_tip ='never')
+    p300.transfer(
+        vol_EB,
+        resevoir['A3'].bottom(z=3), 
+        sample_plate['A1'], 
+        new_tip ='never',
+        blow_out=(True),
+        blowout_location='destination well')
+    custom_mix(p300, 30, vol_EB-3, sample_plate['A1'], 0.4, 1.5)
     p300.drop_tip()
       
     
@@ -239,7 +282,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p10.flow_rate.aspirate = 3
     p10.flow_rate.dispense = 10
     P10.pick_up()
-    p10.transfer(vol_EB-3, sample_plate['A1'], clean_plate['A1'], new_tip ='never')
+    p10.transfer(vol_EB-3, sample_plate['A1'].bottom(z=1), clean_plate['A1'].bottom(z=1), new_tip ='never')
     p10.blow_out()
     p10.drop_tip()
     
