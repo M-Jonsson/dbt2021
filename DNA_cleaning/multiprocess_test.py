@@ -52,12 +52,8 @@ def run(protocol: protocol_api.ProtocolContext):
         if not done:
             check_pause()
 
-    # queue = multiprocessing.Queue()
     thread = threading.Thread(target=check_pause)
     thread.start()
-    # process = threading.start_new_thread(target=check_pause)
-    # process.start()
-    # process.join()
 
     resevoir = protocol.load_labware('usascientific_96_wellplate_2.4ml_deep',8) #Contains Magnetic Beads on A1 and EB on A3.
     tiprack_7 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
