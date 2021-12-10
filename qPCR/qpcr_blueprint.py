@@ -5,7 +5,10 @@ metadata = {'apiLevel': '2.10'}
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    with open('/data/user_storage/own_24_tuberack_1500ul.json') as labware_file:
+    path_to_custom = '/data/user_storage/own_24_tuberack_1500ul.json'
+    if protocol.is_simulating():
+        path_to_custom = 'custom labware\\own_24_tuberack_1500ul.json'
+    with open(path_to_custom) as labware_file:
         labware_def = json.load(labware_file)
 
     tube_rack1 = protocol.load_labware_from_definition(labware_def, 8)
