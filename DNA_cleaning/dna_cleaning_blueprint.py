@@ -17,6 +17,9 @@
 from opentrons import protocol_api
 from opentrons.types import Point
 import math
+import time
+import threading
+
 metadata = {'apiLevel': '2.10'}
 
 def get_values(*names):
@@ -86,6 +89,35 @@ def stepwise_dispense(pipette, volume, location_dispense, steps):
 ####################################
 
 def run(protocol: protocol_api.ProtocolContext):
+
+    protocol.set_rail_lights(True)
+    print('DOOR STATE = ' + str(protocol.door_closed))
+
+    global paused
+    paused = False
+    global done
+    done = False
+
+    def check_pause():
+        global paused
+        global done
+        if not paused and not protocol.door_closed:
+            protocol.pause()
+            paused = True
+        
+        if paused and protocol.door_closed:
+            protocol.resume()
+            paused = False
+
+        print(str(protocol.door_closed))
+        time.sleep(1)
+        print('a')
+        if not done:
+            print('b')
+            check_pause()
+
+    thread = threading.Thread(target=check_pause)
+    thread.start()
 
     #Define and load all labware.
     [mag_mod] = get_values("mag_mod")
@@ -233,6 +265,9 @@ def run(protocol: protocol_api.ProtocolContext):
     
     p300.home()
     mag_deck.disengage()
+
+    done = True
+    thread.join()
 
     print('Protocol Complete')
 

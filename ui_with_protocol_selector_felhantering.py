@@ -1,7 +1,9 @@
+
+import os
+import sys
+import multiprocessing
 from multiprocessing.context import ProcessError
 import subprocess
-import os
-import multiprocessing
 import queue
 import socket
 import math
@@ -9,8 +11,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import replace_values
 import replace_values_qpcr
-import win32gui
-import re
+
 
 # Files and logins for SSH and SCP
 local_user = os.getlogin() # os.getlogin() get username on local machine
@@ -199,9 +200,6 @@ class Bead_protocol_config():
                     tk.messagebox.showerror('Protocol write error!', 'Could not write protocol file. Please check that the template file exists and is accessible.'\
                                             ' Contact your administrator if you are uncertain.')
                 else:
-                    # Calculate total amount of magnetic beads required. 
-                    self.total_beads = (self.sample_no * self.sample_vol * self.ratio) / 8
-                    print(self.total_beads)
                     messagebox.showinfo('Success!', 'Successfully entered parameters into the protocol')
 
                     # Allow starting or simulating the now created protocol
@@ -335,27 +333,8 @@ class qPCR_protocol_config():
             self.prepare_for_run.config(state=tk.NORMAL)
             # Show name of chosen file
             self.file_name_label.config(text=filepath.split('/')[-1], foreground='green')
-    
-    # Should not be needed since the protocol will be started from the check list.
-    '''
-    def start_protocol(self):
-                # Upload the new protocol using 
-        # scp -i <key> <file_to_upload> <where_to_place_it>
-        subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
-        print(f'would have run:\nubprocess.run(scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
-
-        # Launch the new protocol using
-        # ssh -i <key> <login> <command>
-        # -t creates a pseudo terminal on the remote machine (?)
-        # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
-        # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
-        print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
-    '''
 
     def get_estimate(self):
-        cmd = f"opentrons_simulate.exe -e {protocol_qpcr_local_filepath}{protocol_qpcr_name}"
-        print(cmd)
         run = subprocess.run(f"opentrons_simulate.exe -e {protocol_qpcr_local_filepath}{protocol_qpcr_name}", capture_output=True, text=True)
         self.qPCR_estimate = run.stdout.split('\n')[-4]
         messagebox.showinfo('Protocol estimate', f'{self.qPCR_estimate}')
@@ -560,7 +539,7 @@ class Checkbox:
         self.process.start()
 
         self.connection_progress.after(1000, self.try_connection)
- 
+
         
     def try_connection(self):
         try:
@@ -572,7 +551,7 @@ class Checkbox:
         else:
             if not valid_connection:
                 self.connection_button.config(state=tk.NORMAL)
-                self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
+                self.connection_status.config(text='Connection failed', foreground='red')
                 self.connection_progress.destroy()
                 
             elif valid_connection:
@@ -581,15 +560,11 @@ class Checkbox:
                 self.connection_status.config(text='Connection OK', foreground='green')
                 self.connection_progress.destroy()
 
+                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl stop opentrons-robot-server\'')
+                print('Stopped robot server')
+
         
     def run_protocol(self):
-        '''This function runs the protocols, which one it runs is determined by the variable protocol_type when the an object is created.'''
-
-        print(f'this should run the protocol {self.protocol_type}')
-
-        # if self.protocol_type == 'dna':
-
-        print('Running magentic beads protocol')
         '''Uploads the new protocol using 
         scp -i <key> <file_to_upload> <where_to_place_it>
         Then launches the new protocol using
@@ -621,47 +596,22 @@ class Checkbox:
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                # subprocess.Popen(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
-                
+
                 try:
                     log = self.execute_run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
                 except ProcessError:
                     print('error')
-                # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
-                # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
-                # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', capture_output=True, text=True)
-                # log = log.stdout.split('\n')
-                print('--------- printing log -----------------')
 
                 if 'Protocol Complete' in log:
-                    tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
+                    self.run_complete(True)
+                    # tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
                 else:
-                    tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.')
+                    self.run_complete(False)
+                    # tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.')
             except:
                 messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')      
             
-
-        # Beads methods should also work for qPCR
-        '''if self.protocol_type == 'qpcr_output.py':
-            # Upload the new protol using 
-            # # scp -i <key> <file_to_upload> <where_to_place_it>
-            #subprocess.run(f'scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
-            print(f'would have run:\nsubprocess.run(scp -i {key_filename} {protocol_qpcr_local_filepath}{protocol_qpcr_name} {username}@{ip}:{protocol_robot_filepath}{protocol_qpcr_name}')
-            
-            # Launch the new protocol using
-            # ssh -i <key> <login> <command>
-            # -t creates a pseudo terminal on the remote machine (?)
-            # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
-            # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-            #subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
-            print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
-        '''
     def execute_run(self, cmd):
-        # Set python terminal in focus.
-        w = WindowMgr()
-        w.find_window_wildcard(".*py.exe*")
-        w.set_foreground()  
-
         # Start subprocess to run command over SSH.
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
         log = []
@@ -669,38 +619,20 @@ class Checkbox:
             print(line.strip())
             log.append(line.strip())
         return log
-            
-class WindowMgr:
-    """Encapsulates some calls to the winapi for window management
-    Used to put python terminal in focus after starting a protocol.
-    """
+        
+    def run_complete(self, success):
+        if success:
+            exit_choice = tk.messagebox.askyesno('Protocol Completed', 'Protocol was completed successfully!\nDo you want to exit the program?')
+        else:
+            exit_choice = tk.messagebox.askyesno('Protocol Error', 'There was an error in running the protocol.\nDo you want to exit the program?')
 
-    def __init__ (self):
-        """Constructor"""
-        self.window_handle = None
-
-    def find_window(self, class_name, window_name=None):
-        """find a window by its class_name"""
-        self.window_handle = win32gui.FindWindow(class_name, window_name)
-
-    def _window_enum_callback(self, hwnd, wildcard):
-        """Pass to win32gui.EnumWindows() to check all the opened windows"""
-        if re.match(wildcard, str(win32gui.GetWindowText(hwnd))) is not None:
-            self.window_handle = hwnd
-
-    def find_window_wildcard(self, wildcard):
-        """find a window whose title matches the wildcard regex"""
-        self.window_handle = None
-        win32gui.EnumWindows(self._window_enum_callback, wildcard)
-
-    def set_foreground(self):
-        """put the window in the foreground"""
-        win32gui.SetForegroundWindow(self.window_handle)
-
+        if exit_choice:
+            subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl start opentrons-robot-server\'')
+            sys.exit(0)
+        else:
+            pass
 
   
-
-
 class Threaded_ssh_check(multiprocessing.Process):
     def __init__(self, queue):
         super().__init__()
@@ -712,19 +644,15 @@ class Threaded_ssh_check(multiprocessing.Process):
         host = ip
         port = 22
         try:
-            print(1)
             test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            print(2)
-            test_socket.settimeout(9)
+            test_socket.settimeout(20)
             test_socket.connect((host, port))
-            print(3)
         except (socket.error, socket.timeout) as error_msg:
             # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
             print(error_msg)
             # self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
             self.queue.put(False)
         else:
-            print(4)
             test_socket.close()
             # self.run_protocol_button.config(state=tk.NORMAL)
             # self.connection_status.config(text='Connection OK', foreground='green')

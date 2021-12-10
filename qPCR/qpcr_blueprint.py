@@ -1,5 +1,7 @@
 import json
 from opentrons import protocol_api
+import time
+import threading
 
 metadata = {'apiLevel': '2.10'}
 
@@ -36,6 +38,32 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack_2 = protocol.load_labware('opentrons_96_tiprack_10ul', 7)
     p10 = protocol.load_instrument('p10_single', 'left', tip_racks=[tiprack_1, tiprack_2])
 
+    protocol.set_rail_lights(True)
+    
+    global paused
+    paused = False
+    global done
+    done = False
+
+    def check_pause():
+        global paused
+        global done
+        if not paused and not protocol.door_closed:
+            protocol.pause()
+            paused = True
+        
+        if paused and protocol.door_closed:
+            protocol.resume()
+            paused = False
+
+        print(str(protocol.door_closed))
+        time.sleep(1)
+        if not done:
+            check_pause()
+
+    thread = threading.Thread(target=check_pause)
+    thread.start()
+
     for mm in mastermix_destination.keys():
         p10.pick_up_tip()
         for well in mastermix_destination[mm]:
@@ -55,6 +83,9 @@ def run(protocol: protocol_api.ProtocolContext):
         for well in standard_destination[standard]:
             tube_rack = tube_racks[standard_source[standard][0]]
             p10.transfer(4, tube_rack[standard_source[standard][1]], well_plate[well])
+
+    done = True
+    thread.join()
 
     print('Protocol Complete')
     
