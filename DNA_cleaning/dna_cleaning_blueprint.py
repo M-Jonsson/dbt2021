@@ -10,11 +10,12 @@
 #           Johan Lundberg 
 #      
 #   Version information:
-#           v1.0 2021-11-XX: First public version.
+#           v1.1 2021-12-08: Refined after quality controls.
 #
 ####################################
 
 from opentrons import protocol_api
+from opentrons.types import Point
 import math
 metadata = {'apiLevel': '2.10'}
 
@@ -121,42 +122,71 @@ def run(protocol: protocol_api.ProtocolContext):
         if (columns == 1 or columns == 6):
             p300.flow_rate.aspirate=9
             p300.flow_rate.dispense=9            
-            custom_mix(resevoir['A1'], 30, 15, p300, 3, 6)         
+            custom_mix(resevoir['A1'], 30, 15, p300, 3, 6)   
+
+        p300.flow_rate.aspirate=120
+        p300.flow_rate.dispense=30
+        p300.aspirate(volBeads+10, resevoir['A1'].bottom(z=3))
+        p300.dispense(volBeads, sample_plate['A' + str(i)].bottom(z=5))
+        p300.dispense(10, resevoir['A1'].bottom(z=20))
+        p300.blow_out(resevoir['A1'].bottom(z=20))
         p300.flow_rate.aspirate=60
         p300.flow_rate.dispense=60
-        p300.transfer(volBeads, resevoir['A1'].bottom(z=3), sample_plate['A' + str(i)], blow_out=(True), blowout_location='destination well', new_tip='never') 
-        custom_mix(p300, 15, vol_samples+volBeads-5, sample_plate['A' + str(i)], 0.6, 3.5)
+        custom_mix(p300, 15, vol_samples+volBeads-10, sample_plate['A' + str(i)], 0.6, 3) #prev -5 vol, 3mm disp. Ger några luftbubbl. som sedan försvinner.
         p300.drop_tip()
     
     
     #Wait 5 min. Engage magnet. Wait 5 min.
-    protocol.delay(minutes=5)
+    protocol.delay(minutes=5) # 5minutes
     mag_deck.engage() 
-    protocol.delay(minutes=5)
+    protocol.delay(minutes=5) # 5minutes
 
     #Remove liquid from sample.
+    v_tot = volBeads + vol_samples
     for i in range(1,columns+1):
         p300.pick_up_tip()
-        p300.flow_rate.aspirate=15
-        p300.aspirate(vol_samples+volBeads, sample_plate['A' + str(i)].bottom(z=0.8))
+        p300.flow_rate.aspirate=90
+
+        p300.aspirate(v_tot/2 - 5, sample_plate['A' + str(i)].bottom(z=5))
+        p300.aspirate(v_tot/2 - 5, sample_plate['A' + str(i)].bottom(z=2))
+
+        p300.aspirate(5, sample_plate['A' + str(i)].bottom(z=0.5))
+        p300.aspirate(5, sample_plate['A' + str(i)].bottom(z=0.2))
+        p300.aspirate(5, sample_plate['A' + str(i)].bottom(z=0.1))
+        p300.aspirate(5, sample_plate['A' + str(i)].bottom(z=0))
         p300.drop_tip()
     
     #Cleans the samples with EtOH.
     for j in range(1,cleanings+1):
-        p300.flow_rate.aspirate=30
-        p300.flow_rate.dispense=30        
+        p300.flow_rate.aspirate=60
+        p300.flow_rate.dispense=30  
+        #Add ethanol      
         for i in range(1,columns+1):
             p300.pick_up_tip(tiprack_7.wells('A' + str(i))[0]) 
-            p300.aspirate(200, resevoir_EtOH['A' + str(i)].bottom(z=3), 3)
-            stepwise_dispense(p300, 200, sample_plate['A' + str(i)], 10) 
+            p300.aspirate(190, resevoir_EtOH['A' + str(i)].bottom(z=3), 3)
+            stepwise_dispense(p300, 190, sample_plate['A' + str(i)], 10) 
             p300.return_tip() #returns tip to the box
         
         if columns < 4:
             protocol.delay(seconds=30) #delays the protocol 30 seconds if there is fewer than 4 columns
        
+        #Remove ethanol
+        p300.flow_rate.aspirate=90
+        p300.flow_rate.dispense=100  
         for k in range(1,columns+1):
             p300.pick_up_tip(tiprack_7.wells('A' + str(k))[0])
-            p300.transfer(200, sample_plate['A' + str(k)].bottom(z=0.2), resevoir_trash['A' + str(k)].bottom(z=5), blow_out=(True), blowout_location='destination well', new_tip='never') #transfers the EtOH to a trash deep-well-plate
+            center_location = sample_plate['A' + str(k)].bottom(z=0.3)
+            center_location_higher = center_location.move(Point(0, 0, 1.2))
+            adjusted_location1 = center_location.move(Point(0.3, 0.3, 0.1))
+            adjusted_location2 = center_location.move(Point(-0.3, -0.3, 0.1))
+
+            p300.aspirate(150, center_location_higher)
+            p300.aspirate(30, center_location)
+            p300.aspirate(20, adjusted_location1)
+            p300.aspirate(20, adjusted_location2)
+
+            p300.dispense(220, resevoir_trash['A' + str(i)].bottom(z=3))
+            
             if j < cleanings:
                 p300.return_tip()
             elif j == cleanings:
@@ -164,17 +194,23 @@ def run(protocol: protocol_api.ProtocolContext):
                    
     
     #Wait 5 min. Disengage magnet.
-    protocol.delay(minutes=5) 
+    protocol.delay(minutes=5)  # 5minutes
     mag_deck.disengage()
 
 
     #Add EB and mix.
     for i in range(1,columns+1): 
-        p300.flow_rate.aspirate = 60
-        p300.flow_rate.dispense = 60
+        p300.flow_rate.aspirate = 120
+        p300.flow_rate.dispense = 120
         p300.pick_up_tip()
-        p300.transfer(vol_EB, resevoir['A3'].bottom(z=5), sample_plate['A' + str(i)], new_tip ='never')
-        custom_mix(p300, 15, vol_EB-3, sample_plate['A' + str(i)], 0.6, 1.5)
+        p300.transfer(
+            vol_EB,
+            resevoir['A3'].bottom(z=3), 
+            sample_plate['A' + str(i)], 
+            new_tip ='never',
+            blow_out=(True),
+            blowout_location='destination well')
+        custom_mix(p300, 30, vol_EB-3, sample_plate['A' + str(i)], 0.4, 1.5)
         p300.drop_tip()  
     
     #Disengage magnet to release DNA. Wait 1 min.
@@ -187,7 +223,11 @@ def run(protocol: protocol_api.ProtocolContext):
     p10.flow_rate.dispense = 10
     for i in range(1,columns+1):
         p10.pick_up_tip()
-        p10.transfer(vol_EB-3, sample_plate['A' + str(i)].bottom(z=1), clean_plate['A' + str(i)].bottom(z=0.4), new_tip ='never')
+        p10.transfer(
+            vol_EB-3, 
+            sample_plate['A' + str(i)].bottom(z=1), 
+            clean_plate['A' + str(i)].bottom(z=1), 
+            new_tip ='never')
         p10.blow_out()
         p10.drop_tip()
     
