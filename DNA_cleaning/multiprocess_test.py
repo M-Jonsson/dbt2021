@@ -47,11 +47,9 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.resume()
             paused = False
 
-        print(str(protocol.door_closed))
+        print('Door closed = ', str(protocol.door_closed))
         time.sleep(1)
-        print('a')
         if not done:
-            print('b')
             check_pause()
 
     # queue = multiprocessing.Queue()
@@ -65,10 +63,8 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack_7 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p300 = protocol.load_instrument('p300_multi', 'right', tip_racks=[tiprack_7])
 
-    print('DOOR STATE = ' + str(protocol.door_closed))
 
     for i in range(1,2):
-        print('DOOR STATE = ' + str(protocol.door_closed))
         p300.pick_up_tip()
         p300.aspirate(200, resevoir['A1'], rate=1)
         # p300.transfer(50, resevoir['A'+str(i)], resevoir['A'+str(i+6)], new_tip='never')
@@ -76,11 +72,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
 
     done = True
-    print('first done')
-    time.sleep(3)
-    print('pre join')
     thread.join()
-    print('post join')
 
-    os.system("systemctl start opentrons-robot-server")
-    print('done')
+    print('Protocol Complete')
