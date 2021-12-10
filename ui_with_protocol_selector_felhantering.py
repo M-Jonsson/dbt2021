@@ -1,25 +1,18 @@
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-from tkinter import filedialog
-from tkinter.constants import HORIZONTAL, NORMAL
-import replace_values
-import replace_values_qpcr
+from multiprocessing.context import ProcessError
 import subprocess
-from os import getlogin
 import os
-import os.path
-import sys
-import time
 import multiprocessing
 import queue
 import socket
 import math
-
-
+import tkinter as tk
+from tkinter import ttk, messagebox, filedialog
+import replace_values
+import replace_values_qpcr
+import sys
 
 # Files and logins for SSH and SCP
-local_user = getlogin() # os.getlogin() get username on local machine
+local_user = os.getlogin() # os.getlogin() get username on local machine
 key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
 protocol_local_filepath = f'dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
@@ -212,7 +205,6 @@ class Bead_protocol_config():
 
                     # Allow starting or simulating the now created protocol
                     self.button_estimate.config(state=tk.NORMAL)
-                    # self.button_start.config(state=tk.NORMAL)
                     self.prepare_for_run.config(state=tk.NORMAL)
 
                     # Disable editing values since a protocol has been created
@@ -626,18 +618,25 @@ class Checkbox:
                 # -t creates a pseudo terminal on the remote machine (?)
                 # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
                 # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
+                # subprocess.Popen(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
+                
+                try:
+                    self.execute_run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
+                except ProcessError:
+                    print('error')
+                # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
                 # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', stdout=subprocess.PIPE).stdout.decode('utf-8')
                 # log = subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'', capture_output=True, text=True)
                 # log = log.stdout.split('\n')
                 print('--------- printing log -----------------')
+                log = 'test'
                 print(log)
-                print(log.stdout)
-                # print(log)
-                if 'Protocol Complete' in log:
-                    tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
-                else:
-                    tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.')
+                # print(log.stdout)
+                # # print(log)
+                # if 'Protocol Complete' in log:
+                #     tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
+                # else:
+                #     tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.')
             except:
                 messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')      
             
@@ -657,6 +656,15 @@ class Checkbox:
             #subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\'')
             print(f'would have run:\nsubprocess.run(ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_qpcr_name}\')')
         '''
+    def execute_run(self, cmd):
+        print(cmd)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
+        # print(process.stdout)
+        for line in process.stdout:
+            print(line.strip())
+            
+        
+
 
 class Threaded_ssh_check(multiprocessing.Process):
     def __init__(self, queue):
@@ -689,7 +697,6 @@ class Threaded_ssh_check(multiprocessing.Process):
 
 
 def run_gui():
-    os.chdir('..\\')
     # Creates a root window
     root = tk.Tk()
     root.title('Protocol selector')
