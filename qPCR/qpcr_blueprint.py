@@ -1,14 +1,7 @@
-from opentrons import protocol_api
-import time
-from opentrons.commands.commands import drop_tip, pick_up_tip
-from opentrons.protocol_api import protocol_context
 import json
-from opentrons.protocol_api.labware import Well
+from opentrons import protocol_api
 
 metadata = {'apiLevel': '2.10'}
-
-letters = ['A','B']
-
 
 def run(protocol: protocol_api.ProtocolContext):
 
