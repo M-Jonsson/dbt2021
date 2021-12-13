@@ -25,7 +25,7 @@ username = 'root'
 protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
 
-font = (16)
+font = (16) # do not remove
 
 
 class Selector():
