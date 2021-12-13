@@ -25,7 +25,7 @@ username = 'root'
 protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
 
-font = (16) # do not remove
+font = (16)
 
 
 class Selector():
@@ -146,7 +146,8 @@ class Bead_protocol_config():
         EB=float(self.entry_eb.get()) 
         etoh=self.ethanol_var.get()
         Checkbox(parent=self.window, protocol_type=protocol_dna_name, num_samples=sample_no, sample_vol=sample_vol, ratio=ratio, EB=EB, etoh=etoh)
- 
+        self.window.grab_set()
+
     def ok_button(self):
         ''' Checks if all entries are valid.
         If valid, will create a modified protocol with the value given by the user 
@@ -318,6 +319,7 @@ class qPCR_protocol_config():
         checkbox = Checkbox(parent=self.frame_list, protocol_type='qpcr')
 
         checkbox.add_tube_racks(self.window, self.sources, self.destinations)
+        self.window.grab_set()
 
 
     def open_file_dialog(self):
@@ -451,7 +453,8 @@ class Checkbox:
             self.image_name = 'Deck Images\\deck_qpcr.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
-        elif self.protocol_type.startswith('dna') and num_samples > 8: # 8-96 DNA cleaning
+            self.info_text = '\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
+        elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
@@ -462,7 +465,7 @@ class Checkbox:
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
             self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
-        elif self.protocol_type.startswith('dna') and num_samples <= 8: # 1-7 DNA cleaning
+        elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
@@ -476,14 +479,15 @@ class Checkbox:
         else:
             messagebox.showerror('Error', f"Invalid protocol type '{self.protocol_type}' entered.")
     
-        # self.var1 = tk.IntVar()
-        
-        #self.start_button = tk.Button(self.frame, text='Start protocol', command=self.start_protocol, state=tk.DISABLED)
+
         self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh, style='my.small.TButton')
-        self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
+        self.connection_button.grid(row=3, column=1, rowspan=2, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
         
         self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled', style='my.small.TButton')
         self.run_protocol_button.grid(row=22, column= 2, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
+
+        self.quit_protocol_button = ttk.Button(self.frame, text='Exit', command= self.quit, style='my.small.TButton')
+        self.quit_protocol_button.grid(row=22, column= 1, padx=10, pady=10, ipadx=15, ipady=5, sticky=tk.E)
         
         self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
@@ -551,7 +555,7 @@ class Checkbox:
             # valid_connection = True
             valid_connection = self.queue.get_nowait()
         except queue.Empty:
-            print('checking queue')
+            print('Attempting to connect...')
             self.connection_progress.after(3000, self.try_connection)
         else:
             if not valid_connection:
@@ -565,8 +569,8 @@ class Checkbox:
                 self.connection_status.config(text='Connection OK', foreground='green')
                 self.connection_progress.destroy()
 
+                print('Preparing robot to run by stopping opentrons-robot-server')
                 subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl stop opentrons-robot-server\'')
-                print('Stopped robot server')
 
         
     def run_protocol(self):
@@ -592,30 +596,26 @@ class Checkbox:
             try:
                 time_process.close()
             except ValueError:
-                print("Time process still running")
+                print('Time process still running')
         else:
             # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
+            # Launch the new protocol using
+            # ssh -i <key> <login> -t "sh -lic" <command>
+            # -t creates a pseudo terminal on the remote machine (?)
+            # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
+            # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
             try:
-                # Launch the new protocol using
-                # ssh -i <key> <login> <command>
-                # -t creates a pseudo terminal on the remote machine (?)
-                # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
-                # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+                log = self.execute_run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
+            except ProcessError:
+                print('There was an error starting the run.')
 
-                try:
-                    log = self.execute_run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
-                except ProcessError:
-                    print('error')
+            if 'Protocol Complete' in log:
+                # self.run_complete(True)
+                messagebox.showinfo('Run Completed', 'Protocol was completed successfully!', parent=self.parent)
+            else:
+                # self.run_complete(False)
+                messagebox.showwarning('Run Failed!', 'Protocol was canceled before completing,\neither due to an error or it was canceled by the user.', parent=self.parent)
 
-                if 'Protocol Complete' in log:
-                    self.run_complete(True)
-                    # tk.messagebox.showinfo('Protocol Completed', 'Protocol was completed successfully!')
-                else:
-                    self.run_complete(False)
-                    # tk.messagebox.showerror('Protocol Error', 'There was an error in running the protocol.')
-            except:
-                messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')      
-            
     def execute_run(self, cmd):
         # Start subprocess to run command over SSH.
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
@@ -625,18 +625,24 @@ class Checkbox:
             log.append(line.strip())
         return log
         
-    def run_complete(self, success):
-        if success:
-            exit_choice = tk.messagebox.askyesno('Protocol Completed', 'Protocol was completed successfully!\nDo you want to exit the program?')
-        else:
-            exit_choice = tk.messagebox.askyesno('Protocol Error', 'There was an error in running the protocol.\nDo you want to exit the program?')
+    # def run_complete(self, success):
+    #     if success:
+    #         exit_choice = messagebox.askyesno('Protocol Completed', 'Protocol was completed successfully!\nDo you want to exit the program?')
+    #     else:
+    #         exit_choice = messagebox.askyesno('Protocol Error', 'There was an error in running the protocol.\nDo you want to exit the program?')
 
+    #     if exit_choice:
+    #         subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl start opentrons-robot-server\'')
+    #         sys.exit(0)
+    #     else:
+    #         pass
+
+    def quit(self):
+        exit_choice = messagebox.askyesno('Quitting', 'This will close the program and prepare the robot to shut down.\nDo you want to continue?', parent=self.parent)
         if exit_choice:
+            print('Shutting down...')
             subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl start opentrons-robot-server\'')
             sys.exit(0)
-        else:
-            pass
-
   
 class Threaded_ssh_check(multiprocessing.Process):
     def __init__(self, queue):
@@ -676,10 +682,10 @@ def run_gui():
 
         # Error check to see that the ssh_key is exists.
     if os.path.isfile(key_filename):
-        print("ssh-key read successfully.")
-    #else:
-        #messagebox.showerror('File not found error!', f'SSH Key could not be found. Please check the filepath: {key_filename} and confirm it is placed there')
-        #sys.exit(0)
+        print(f'ssh-key found in {key_filename}.')
+    else:
+        messagebox.showerror('File not found error!', f'SSH Key could not be found.\nA new key can be created following the instructions on the Opentrons website.\nPlease make sure that the key is then placed in: {key_filename}')
+        
 
     root.mainloop()
 
