@@ -135,6 +135,3 @@ def replace_values_qpcr(destinations, sources):
         for well_group in all_wells:
             wells_str = str(all_wells[well_group])
             file.write(f'\n{well_group} = {wells_str}')
-
-
-# csv_till_lista(r"C:\Users\Mathias\OneDrive\Dokument\Python\DBT2021\qPCR\ChIP_max.csv")
