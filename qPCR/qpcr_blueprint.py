@@ -23,14 +23,14 @@ def run(protocol: protocol_api.ProtocolContext):
     tube_rack8 = protocol.load_labware_from_definition(labware_def, 3)
 
     tube_racks = {
-        'tr1': tube_rack1, 
-        'tr2': tube_rack2, 
-        'tr3': tube_rack3, 
-        'tr4': tube_rack4, 
-        'tr5': tube_rack5, 
-        'tr6': tube_rack6,
-        'tr7': tube_rack7,
-        'tr8': tube_rack8}
+        'Tube rack 1': tube_rack1, 
+        'Tube rack 2': tube_rack2, 
+        'Tube rack 3': tube_rack3, 
+        'Tube rack 4': tube_rack4, 
+        'Tube rack 5': tube_rack5, 
+        'Tube rack 6': tube_rack6,
+        'Tube rack 7': tube_rack7,
+        'Tube rack 8': tube_rack8}
 
     well_plate = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 11)
 
@@ -59,7 +59,10 @@ def run(protocol: protocol_api.ProtocolContext):
         print(str(protocol.door_closed))
         time.sleep(1)
         if not done:
-            check_pause()
+            try:
+                check_pause()
+            except KeyboardInterrupt:
+                pass
 
     thread = threading.Thread(target=check_pause)
     thread.start()
