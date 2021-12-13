@@ -1,0 +1,91 @@
+Row,Column,Sample Type,Replicate #,*Target Name,*Sample Name,*Biological Set Name,*Well Note,Starting Quantity,Units
+A,1,Std,1,3Rnc-1,,Psc4-6_Psc4,,2.56E-02,copy number
+A,2,Std,2,3Rnc-1,,Psc4-6_Psc4,,1.28E-02,copy number
+A,3,Std,3,3Rnc-1,,Psc4-6_Psc4,,6.40E-03,copy number
+A,4,Std,4,3Rnc-1,,Psc4-6_Psc4,,3.20E-03,copy number
+A,5,Std,5,3Rnc-1,,Psc4-6_Psc4,,1.60E-03,copy number
+A,6,Std,6,3Rnc-1,,Psc4-6_Psc4,,8.00E-04,copy number
+A,7,Std,25,Su(z)2-ex1,,Psc4-6_Psc4,,2.56E-02,copy number
+A,8,Std,26,Su(z)2-ex1,,Psc4-6_Psc4,,1.28E-02,copy number
+A,9,Std,27,Su(z)2-ex1,,Psc4-6_Psc4,,6.40E-03,copy number
+A,10,Std,28,Su(z)2-ex1,,Psc4-6_Psc4,,3.20E-03,copy number
+A,11,Std,29,Su(z)2-ex1,,Psc4-6_Psc4,,1.60E-03,copy number
+A,12,Std,30,Su(z)2-ex1,,Psc4-6_Psc4,,8.00E-04,copy number
+B,1,Std,13,BP,,Psc4-6_Psc4,,2.56E-02,copy number
+B,2,Std,14,BP,,Psc4-6_Psc4,,1.28E-02,copy number
+B,3,Std,15,BP,,Psc4-6_Psc4,,6.40E-03,copy number
+B,4,Std,16,BP,,Psc4-6_Psc4,,3.20E-03,copy number
+B,5,Std,17,BP,,Psc4-6_Psc4,,1.60E-03,copy number
+B,6,Std,18,BP,,Psc4-6_Psc4,,8.00E-04,copy number
+B,7,Std,31,srp1,,Psc4-6_Psc4,,2.56E-02,copy number
+B,8,Std,32,srp1,,Psc4-6_Psc4,,1.28E-02,copy number
+B,9,Std,33,srp1,,Psc4-6_Psc4,,6.40E-03,copy number
+B,10,Std,34,srp1,,Psc4-6_Psc4,,3.20E-03,copy number
+B,11,Std,35,srp1,,Psc4-6_Psc4,,1.60E-03,copy number
+B,12,Std,36,srp1,,Psc4-6_Psc4,,8.00E-04,copy number
+C,1,Std,19,FM1,,Psc4-6_Psc4,,2.56E-02,copy number
+C,2,Std,20,FM1,,Psc4-6_Psc4,,1.28E-02,copy number
+C,3,Std,21,FM1,,Psc4-6_Psc4,,6.40E-03,copy number
+C,4,Std,22,FM1,,Psc4-6_Psc4,,3.20E-03,copy number
+C,5,Std,23,FM1,,Psc4-6_Psc4,,1.60E-03,copy number
+C,6,Std,24,FM1,,Psc4-6_Psc4,,8.00E-04,copy number
+C,7,Std,37,GATAe-exp1,,Psc4-6_Psc4,,2.56E-02,copy number
+C,8,Std,38,GATAe-exp1,,Psc4-6_Psc4,,1.28E-02,copy number
+C,9,Std,39,GATAe-exp1,,Psc4-6_Psc4,,6.40E-03,copy number
+C,10,Std,40,GATAe-exp1,,Psc4-6_Psc4,,3.20E-03,copy number
+C,11,Std,41,GATAe-exp1,,Psc4-6_Psc4,,1.60E-03,copy number
+C,12,Std,42,GATAe-exp1,,Psc4-6_Psc4,,8.00E-04,copy number
+D,1,Unkn,,3Rnc-1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+D,2,Unkn,,3Rnc-1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+D,3,Unkn,,3Rnc-1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+D,4,Unkn,,3Rnc-1,no ab,Psc4-6_Psc4,200,N/A,copy number
+D,5,Unkn,,BP,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+D,6,Unkn,,BP,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+D,7,Unkn,,BP,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+D,8,Unkn,,BP,no ab,Psc4-6_Psc4,200,N/A,copy number
+D,9,Unkn,,FM1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+D,10,Unkn,,FM1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+D,11,Unkn,,FM1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+D,12,Unkn,,FM1,no ab,Psc4-6_Psc4,200,N/A,copy number
+E,1,Unkn,,3Rnc-1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+E,2,Unkn,,3Rnc-1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+E,3,Unkn,,3Rnc-1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+E,4,Unkn,,3Rnc-1,no ab,Psc4-6_Psc4,200,N/A,copy number
+E,5,Unkn,,BP,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+E,6,Unkn,,BP,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+E,7,Unkn,,BP,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+E,8,Unkn,,BP,no ab,Psc4-6_Psc4,200,N/A,copy number
+E,9,Unkn,,FM1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+E,10,Unkn,,FM1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+E,11,Unkn,,FM1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+E,12,Unkn,,FM1,no ab,Psc4-6_Psc4,200,N/A,copy number
+F,1,Unkn,,Su(z)2-ex1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+F,2,Unkn,,Su(z)2-ex1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+F,3,Unkn,,Su(z)2-ex1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+F,4,Unkn,,Su(z)2-ex1,no ab,Psc4-6_Psc4,200,N/A,copy number
+F,5,Unkn,,srp1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+F,6,Unkn,,srp1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+F,7,Unkn,,srp1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+F,8,Unkn,,srp1,no ab,Psc4-6_Psc4,200,N/A,copy number
+F,9,Unkn,,GATAe-exp1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+F,10,Unkn,,GATAe-exp1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+F,11,Unkn,,GATAe-exp1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+F,12,Unkn,,GATAe-exp1,no ab,Psc4-6_Psc4,200,N/A,copy number
+G,1,Unkn,,Su(z)2-ex1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+G,2,Unkn,,Su(z)2-ex1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+G,3,Unkn,,Su(z)2-ex1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+G,4,Unkn,,Su(z)2-ex1,no ab,Psc4-6_Psc4,200,N/A,copy number
+G,5,Unkn,,srp1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+G,6,Unkn,,srp1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+G,7,Unkn,,srp1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+G,8,Unkn,,srp1,no ab,Psc4-6_Psc4,200,N/A,copy number
+G,9,Unkn,,GATAe-exp1,RING-AS,Psc4-6_Psc4,200,N/A,copy number
+G,10,Unkn,,GATAe-exp1,H2AUb,Psc4-6_Psc4,200,N/A,copy number
+G,11,Unkn,,GATAe-exp1,H3K27me3-CS,Psc4-6_Psc4,200,N/A,copy number
+G,12,Unkn,,GATAe-exp1,no ab,Psc4-6_Psc4,200,N/A,copy number
+H,1,NTC,,3Rnc-1,,,,N/A,copy number
+H,2,NTC,,BP,,,,N/A,copy number
+H,3,NTC,,FM1,,,,N/A,copy number
+H,4,NTC,,Su(z)2-ex1,,,,N/A,copy number
+H,5,NTC,,srp1,,,,N/A,copy number
+H,6,NTC,,GATAe-exp1,,,,N/A,copy number
