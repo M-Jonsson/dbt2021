@@ -460,7 +460,7 @@ class Checkbox:
             self.image_name = 'Deck Images\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
-            self.info_text = '\n\n Pause the protocol by opening the door\n Resume the protocol by closing the door'
+            self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             columns=math.ceil(num_samples/8)
@@ -471,7 +471,7 @@ class Checkbox:
             self.image_name = 'Deck Images\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
-            self.info_text = '\n\n Pause the protocol by opening the door\n Resume the protocol by closing the door'
+            self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
         else:
             messagebox.showerror('Error', f"Invalid protocol type '{self.protocol_type}' entered.")
