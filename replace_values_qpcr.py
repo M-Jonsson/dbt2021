@@ -78,7 +78,7 @@ def csv_till_lista(filepath):
     # from list of wells on tube rack.
     wells_list_tr = ['A1', 'B1', 'C1', 'D1', 'A2', 'B2', 'C2', 'D2', 'A3', 'B3', 'C3', 'D3', 
                        'A4', 'B4', 'C4', 'D4', 'A5', 'B5', 'C5', 'D5', 'A6', 'B6', 'C6', 'D6']
-    tube_racks = ['tr1', 'tr2', 'tr3', 'tr4', 'tr5', 'tr6', 'tr7', 'tr8']
+    tube_racks = ['Tube rack 1', 'Tube rack 2', 'Tube rack 3', 'Tube rack 4', 'Tube rack 5', 'Tube rack 6', 'Tube rack 7', 'Tube rack 8']
     tube_rack_wells = [[tube_rack, well] for tube_rack in tube_racks for well in wells_list_tr]
 
     mastermix_source = {}
