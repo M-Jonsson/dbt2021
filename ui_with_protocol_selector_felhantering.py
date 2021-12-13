@@ -460,6 +460,7 @@ class Checkbox:
             self.image_name = 'Deck Images\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
+            self.info_text = '\n\n Pause the protocol by opening the door\n Resume the protocol by closing the door'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             columns=math.ceil(num_samples/8)
@@ -470,6 +471,7 @@ class Checkbox:
             self.image_name = 'Deck Images\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
+            self.info_text = '\n\n Pause the protocol by opening the door\n Resume the protocol by closing the door'
             self.add_image(self.frame, self.image_name)
         else:
             messagebox.showerror('Error', f"Invalid protocol type '{self.protocol_type}' entered.")
@@ -481,13 +483,16 @@ class Checkbox:
         self.connection_button.grid(row=3, column=1, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
         
         self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled', style='my.small.TButton')
-        self.run_protocol_button.grid(row=20, column= 2, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
+        self.run_protocol_button.grid(row=22, column= 2, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
         
         self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
         self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font).grid(row=10, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+    
 
         self.volumes = ttk.Label(self.frame, text=self.volumes_label, font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
+
+        self.info = ttk.Label(self.frame, text=self.info_text, font=font,foreground='red').grid(row=20, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
 
         self.connection_status = ttk.Label(self.frame, text='   Check Connection', style='my.TLabel', foreground= 'green')
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
