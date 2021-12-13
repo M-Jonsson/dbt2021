@@ -451,7 +451,7 @@ class Checkbox:
             self.image_name = 'Deck Images\\deck_qpcr.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
             self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
-        elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
+        elif self.protocol_type.startswith('dna') and num_samples > 8: # 8-96 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
@@ -462,7 +462,7 @@ class Checkbox:
             self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
             self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
-        elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
+        elif self.protocol_type.startswith('dna') and num_samples <= 8: # 1-7 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
