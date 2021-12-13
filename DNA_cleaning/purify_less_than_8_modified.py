@@ -232,7 +232,7 @@ def run(protocol: protocol_api.ProtocolContext):
         #remove EtOH
         p300.flow_rate.aspirate=90
         p300.flow_rate.dispense=100
-        p300.pick_up_tip(tiprack_7.wells('A' + str(i))[0])
+        #p300.pick_up_tip(tiprack_7.wells('A' + str(i))[0])
         center_location = sample_plate['A' + str(i)].bottom(z=0.3)
         center_location_higher = center_location.move(Point(0, 0, 1.2))
         adjusted_location1 = center_location.move(Point(0.3, 0.3, 0.1))
@@ -245,10 +245,10 @@ def run(protocol: protocol_api.ProtocolContext):
 
         p300.dispense(220, resevoir_trash['A' + str(i)].bottom(z=3))
             
-        if i < cleanings:
-            p300.return_tip()
-        elif i == cleanings:
-            p300.drop_tip() 
+        # if i < cleanings:
+        #     p300.return_tip()
+        # elif i == cleanings:
+        #     p300.drop_tip() 
     p300.drop_tip()
     
     
