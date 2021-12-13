@@ -284,6 +284,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p10.drop_tip()
     
     p300.home()
+    p10.home()
     mag_deck.disengage()
 
     print('Protocol Complete')
