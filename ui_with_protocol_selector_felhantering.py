@@ -452,7 +452,7 @@ class Checkbox:
             self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
             self.image_name = 'Deck Images\\deck_qpcr.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
-            self.volumes_label = '4. Fill each tube rack according to its tab.\n    The tabs can be selected on the row above the image.'
+            self.volumes_label = '4. Fill each tube rack according to its tab\n    The tabs can be selected on the row above the image\n\n5. Do not forget the alluminium block under the PCR plate'
             self.info_text = '\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
             columns=math.ceil(num_samples/8)
@@ -462,7 +462,7 @@ class Checkbox:
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'Deck Images\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
+            self.volumes_label = '\n     Magnetic beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
             self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
@@ -473,7 +473,7 @@ class Checkbox:
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'Deck Images\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     Magnetic beads: '+str(beads)+'µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
+            self.volumes_label = '\n     Magnetic beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
             self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
         else:
