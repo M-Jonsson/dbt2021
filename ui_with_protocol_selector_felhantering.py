@@ -19,8 +19,8 @@ key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
 protocol_local_filepath = f'dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
 protocol_dna_name = 'dna_cleaning_output.py'
-# ip = '169.254.99.249'
-ip = '169.254.29.201' #standard ip
+ip1 = '169.254.29.201' #standard ip
+ip2 = '169.254.99.249' #secondary ip
 username = 'root'
 protocol_qpcr_local_filepath = f'qPCR\\'
 protocol_qpcr_name = 'qpcr_output.py'
@@ -40,9 +40,9 @@ class Selector():
         self.frame.grid()
         self.s = ttk.Style()
         self.s.configure('my.TButton', font=('Helvetica', 12), background = 'grey')
-        self.s.configure('small.TButton', font=('Helvetica', 10), background = 'grey')
+        self.s.configure('small.TButton', font=('Helvetica', 11), background = 'grey')
         self.s.configure('my.TLabel', font =('Helvetica', 15))
-        self.s.configure('text.TLabel', font=('Helvetica', 10))
+        self.s.configure('text.TLabel', font=('Helvetica', 11))
 
         self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', style ='my.TLabel', anchor="e", justify="right")
         self.label_selection_info.grid(row=0,column=0,columnspan=2, padx=20, pady=20)
@@ -71,12 +71,7 @@ class Selector():
 
         self.frame.destroy()
         qPCR_protocol_config()
-
-    def test(self):
-        test_protocol = 'multiprocess_test.py'
-        subprocess.run(f'scp -i {key_filename} {protocol_local_filepath}{test_protocol} {username}@{ip}:{protocol_robot_filepath}{test_protocol}')
-        subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'python -m opentrons.execute(protocol_file={protocol_robot_filepath}{test_protocol}, custom_labware_path=/data/user_storage\'')
-        
+   
 
 class Bead_protocol_config():
     '''Contains a frame with widgets used configure a magnetic bead DNA purification protocol.
@@ -218,48 +213,6 @@ class Bead_protocol_config():
 
         except ValueError:
             messagebox.showerror('Notice', 'You did not enter valid numbers')
-
-
-    # Should not be needed
-    # Protocol is started from checklist
-    """
-    def start_run(self):
-        '''Uploads the new protocol using 
-        scp -i <key> <file_to_upload> <where_to_place_it>
-
-        Then launches the new protocol using
-        ssh -i <key> <login> -t "sh -lic" <command>
-        -t creates a pseudo terminal on the remote machine (?)
-        sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
-        which is required to initialize everything correctly.
-        Else the robot cannot use any labware or find calibration data. 
-        '''
-        # Upload the new protocol using 
-        # scp -i <key> <file_to_upload> <where_to_place_it>
-        # Defines the multiprocess to be able to handle errors when transferring the protocol to the robot via SCP.
-        time_process = multiprocessing.Process(target=scp_transfer, name="SCP transfer")
-        time_process.start()
-        time_process.join(5)
-        # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
-        if time_process.is_alive():
-            time_process.terminate()
-            messagebox.showerror('Transfer Error!','An error occured during the transfer of the protocol file to the robot.')
-            try:
-                time_process.close()
-            except ValueError:
-                print("Time process still running")
-        else:
-            # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
-            try:
-                # Launch the new protocol using
-                # ssh -i <key> <login> <command>
-                # -t creates a pseudo terminal on the remote machine (?)
-                # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
-                # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
-                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{protocol_dna_name}\'')
-            except:
-                messagebox.showerror('Error', 'There was an error running the powershell SSH connect command.')     
-    """
 
 
     def get_estimate(self):
@@ -443,6 +396,7 @@ class Checkbox:
     '''Checkbox class containing checkboxes and other stuff. very bare bones at the moment'''
     def __init__(self, parent, protocol_type: str, num_samples=None, sample_vol=None, ratio=None, EB=None, etoh=None):
         
+        self.ip = ip1
         self.parent = parent
         self.frame = ttk.Frame(self.parent)
         self.frame.pack()
@@ -498,7 +452,7 @@ class Checkbox:
 
         self.info = ttk.Label(self.frame, text=self.info_text, font=font,foreground='red').grid(row=20, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
 
-        self.connection_status = ttk.Label(self.frame, text='   Check Connection', style='my.TLabel', foreground= 'green')
+        self.connection_status = ttk.Label(self.frame, text='   Check connection\n     to continue', font=font, foreground= 'red')
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
 
     def add_image(self, parent, image_path):
@@ -520,7 +474,7 @@ class Checkbox:
 
 
     def check_ssh(self):
-        '''This function should check if you have a ssh-connection.
+        '''Checks if it is possible to connect by SSH.
         Creates a Queue object and passes it to a Process subclass, Threaded_ssh_check().
         The queue creates a connection between the main process (the UI) and this new process.
         When the process is started, its run() method is executed,
@@ -544,7 +498,7 @@ class Checkbox:
 
 
         self.queue = multiprocessing.Queue()
-        self.process = Threaded_ssh_check(self.queue)
+        self.process = Threaded_ssh_check(self.queue, self.ip)
         self.process.start()
 
         self.connection_progress.after(1000, self.try_connection)
@@ -555,13 +509,14 @@ class Checkbox:
             # valid_connection = True
             valid_connection = self.queue.get_nowait()
         except queue.Empty:
-            print('Attempting to connect...')
+            print(f'Attempting to connect to {self.ip}')
             self.connection_progress.after(3000, self.try_connection)
         else:
             if not valid_connection:
                 self.connection_button.config(state=tk.NORMAL)
                 self.connection_status.config(text='Connection failed', foreground='red')
                 self.connection_progress.destroy()
+                self.change_ip()
                 
             elif valid_connection:
                 self.connection_button.config(state=tk.NORMAL)
@@ -570,7 +525,7 @@ class Checkbox:
                 self.connection_progress.destroy()
 
                 print('Preparing robot to run by stopping opentrons-robot-server')
-                subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl stop opentrons-robot-server\'')
+                subprocess.run(f'ssh -i {key_filename} {username}@{self.ip} -t "sh -lic" \'systemctl stop opentrons-robot-server\'')
 
         
     def run_protocol(self):
@@ -586,7 +541,7 @@ class Checkbox:
         # Upload the new protocol using 
         # scp -i <key> <file_to_upload> <where_to_place_it>
         # Defines the multiprocess to be able to handle errors when transferring the protocol to the robot via SCP.
-        time_process = multiprocessing.Process(target=scp_transfer(self.protocol), name="SCP transfer")
+        time_process = multiprocessing.Process(target=self.scp_transfer(self.protocol), name="SCP transfer")
         time_process.start()
         time_process.join(5)
         # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
@@ -605,7 +560,7 @@ class Checkbox:
             # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
             # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
             try:
-                log = self.execute_run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\'')
+                log = self.execute_run()
             except ProcessError:
                 print('There was an error starting the run.')
 
@@ -615,58 +570,84 @@ class Checkbox:
             else:
                 # self.run_complete(False)
                 messagebox.showwarning('Run Failed!', 'Protocol was canceled before completing,\neither due to an error or it was canceled by the user.', parent=self.parent)
+    
+    # Small function to enable multiprocessing later - used only for error-checking.
+    def scp_transfer(self, protocol):
+        subprocess.run(f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{self.ip}:{protocol_robot_filepath}{protocol[1]}')
+        return  
 
-    def execute_run(self, cmd):
+    def execute_run(self):
+        '''Starts the robot by calling for 'opentrons_execute' over SSH using a subprocess.
+        Saves the output in a log, which is also continuously printed so that it is also visible
+        to the user. 
+
+            Parameters:
+                None.
+            
+            Returns:
+                log (list):     Output from the subprocess as a list. 
+
+        '''
         # Start subprocess to run command over SSH.
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
+        command = f'ssh -i {key_filename} {username}@{self.ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\''
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, text=True)
         log = []
         for line in process.stdout:
             print(line.strip())
             log.append(line.strip())
         return log
-        
-    # def run_complete(self, success):
-    #     if success:
-    #         exit_choice = messagebox.askyesno('Protocol Completed', 'Protocol was completed successfully!\nDo you want to exit the program?')
-    #     else:
-    #         exit_choice = messagebox.askyesno('Protocol Error', 'There was an error in running the protocol.\nDo you want to exit the program?')
-
-    #     if exit_choice:
-    #         subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl start opentrons-robot-server\'')
-    #         sys.exit(0)
-    #     else:
-    #         pass
 
     def quit(self):
+        '''Restarts the opentrons-robot-server before closing the program
+        if the user chooses "yes" when asked.
+
+            Parameters:
+                None.
+            
+            Returns:
+                Nothing.
+
+        '''
         exit_choice = messagebox.askyesno('Quitting', 'This will close the program and prepare the robot to shut down.\nDo you want to continue?', parent=self.parent)
         if exit_choice:
             print('Shutting down...')
-            subprocess.run(f'ssh -i {key_filename} {username}@{ip} -t "sh -lic" \'systemctl start opentrons-robot-server\'')
+            subprocess.run(f'ssh -i {key_filename} {username}@{self.ip} -t "sh -lic" \'systemctl start opentrons-robot-server\'')
             sys.exit(0)
+    
+    def change_ip(self):
+        '''Alternates between the two most common ip addresses.
+        Made for if the ssh_check fails in order to try another next attempt.
+
+            Parameters:
+                None.
+            
+            Returns:
+                Nothing.
+
+        '''
+        if self.ip == ip1:
+            self.ip = ip2
+        elif self.ip == ip2:
+            self.ip = ip1
   
 class Threaded_ssh_check(multiprocessing.Process):
-    def __init__(self, queue):
+    def __init__(self, queue, ip):
         super().__init__()
         self.queue = queue
+        self.ip = ip
     
-
     def run(self):
-        # host = 'localhost'
-        host = ip
+        host = self.ip
         port = 22
         try:
             test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            test_socket.settimeout(20)
+            test_socket.settimeout(6)
             test_socket.connect((host, port))
         except (socket.error, socket.timeout) as error_msg:
-            # tk.messagebox.showerror('Notice', 'Could not establish a ssh-connection')
             print(error_msg)
-            # self.connection_status.config(text='Connection failed', foreground='red') #, wraplength=200)
             self.queue.put(False)
         else:
             test_socket.close()
-            # self.run_protocol_button.config(state=tk.NORMAL)
-            # self.connection_status.config(text='Connection OK', foreground='green')
             self.queue.put(True)
 
 
@@ -677,22 +658,20 @@ def run_gui():
 
     # Creates a frame for the root window with widgets for protocol selection. 
     Selector()
-    #Checkbox('qpcr_output.py')
-    #Checkbox('dna_cleaning_output.py')
 
-        # Error check to see that the ssh_key is exists.
+    # Error check to see that the ssh_key exists.
     if os.path.isfile(key_filename):
         print(f'ssh-key found in {key_filename}.')
     else:
-        messagebox.showerror('File not found error!', f'SSH Key could not be found.\nA new key can be created following the instructions on the Opentrons website.\nPlease make sure that the key is then placed in: {key_filename}')
+        messagebox.showerror('File not found error!', f'SSH Key could not be found.\n\nA new key can be created following the instructions on the Opentrons website.\nIf a new key has been created,\nplease make sure that the key is placed in: {key_filename}')
         
 
     root.mainloop()
 
-# Small function to enable multiprocessing later - used only for error-checking.
-def scp_transfer(protocol):
-    subprocess.run(f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{ip}:{protocol_robot_filepath}{protocol[1]}')
-    return  
+# # Small function to enable multiprocessing later - used only for error-checking.
+# def scp_transfer(protocol):
+#     subprocess.run(f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{ip}:{protocol_robot_filepath}{protocol[1]}')
+#     return  
 
 # Main if-statement that runs the program.
 if __name__ == '__main__':
