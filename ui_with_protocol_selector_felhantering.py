@@ -47,7 +47,7 @@ class Selector():
         self.label_selection_info = ttk.Label(self.frame, text='Select a protocol', style ='my.TLabel', anchor="e", justify="right")
         self.label_selection_info.grid(row=0,column=0,columnspan=2, padx=20, pady=20)
 
-        self.button_beads = ttk.Button(self.frame, text='Magnetic beads\nDNA purification', command=self.select_protocol_beads,style='my.TButton')
+        self.button_beads = ttk.Button(self.frame, text='SPRI beads\nDNA purification', command=self.select_protocol_beads,style='my.TButton')
         self.button_beads.grid(row=1, column=0, padx=10, pady=10, ipadx=5, ipady=1)
 
         self.button_qpcr = ttk.Button(self.frame, text='qPCR protocol', command=self.select_protocol_qpcr,style='my.TButton')
@@ -462,7 +462,7 @@ class Checkbox:
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'Deck Images\\deck_96.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     Magnetic beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
+            self.volumes_label = '\n     SPRI beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
             self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
@@ -473,7 +473,7 @@ class Checkbox:
             self.protocol = [protocol_local_filepath, protocol_dna_name]
             self.image_name = 'Deck Images\\deck_less_8.gif'
             self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     Magnetic beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
+            self.volumes_label = '\n     SPRI beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
             self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
             self.add_image(self.frame, self.image_name)
         else:
