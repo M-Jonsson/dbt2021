@@ -91,7 +91,6 @@ def stepwise_dispense(pipette, volume, location_dispense, steps):
 def run(protocol: protocol_api.ProtocolContext):
 
     protocol.set_rail_lights(True)
-    print('DOOR STATE = ' + str(protocol.door_closed))
 
     global paused
     paused = False
@@ -109,11 +108,15 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.resume()
             paused = False
 
-        print(str(protocol.door_closed))
+        if paused and not protocol.door_closed:
+            print('Protocol paused. Close the door to the robot to resume.')
+
         time.sleep(1)
-        print('a')
-        if not done:
-            print('b')
+        
+        # Check if the main thread is still alive or if the run has been stopped by ctrl+C
+        run_canceled = not threading.main_thread().is_alive()
+
+        if not done and not run_canceled:
             check_pause()
 
     thread = threading.Thread(target=check_pause)

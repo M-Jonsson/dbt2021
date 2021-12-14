@@ -56,13 +56,16 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.resume()
             paused = False
 
-        print(str(protocol.door_closed))
+        if paused and not protocol.door_closed:
+            print('Protocol paused. Close the door to the robot to resume.')
+
         time.sleep(1)
-        if not done:
-            try:
-                check_pause()
-            except KeyboardInterrupt:
-                pass
+
+        # Check if the main thread is still alive or if the run has been stopped by ctrl+C
+        run_canceled = not threading.main_thread().is_alive()
+
+        if not done and not run_canceled:
+            check_pause()
 
     thread = threading.Thread(target=check_pause)
     thread.start()
