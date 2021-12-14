@@ -7,12 +7,14 @@ metadata = {'apiLevel': '2.10'}
 
 def run(protocol: protocol_api.ProtocolContext):
 
+    # Load custom labware from file
     path_to_custom = '/data/user_storage/own_24_tuberack_1500ul.json'
     if protocol.is_simulating():
         path_to_custom = 'custom labware\\own_24_tuberack_1500ul.json'
     with open(path_to_custom) as labware_file:
         labware_def = json.load(labware_file)
 
+    # Add custom labware to deck
     tube_rack1 = protocol.load_labware_from_definition(labware_def, 8)
     tube_rack2 = protocol.load_labware_from_definition(labware_def, 9)
     tube_rack3 = protocol.load_labware_from_definition(labware_def, 4)
@@ -32,14 +34,22 @@ def run(protocol: protocol_api.ProtocolContext):
         'Tube rack 7': tube_rack7,
         'Tube rack 8': tube_rack8}
 
-    well_plate = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 11)
-
+    # Add standard labware
     tiprack_1 = protocol.load_labware('opentrons_96_tiprack_10ul', 10)
     tiprack_2 = protocol.load_labware('opentrons_96_tiprack_10ul', 7)
     p10 = protocol.load_instrument('p10_single', 'left', tip_racks=[tiprack_1, tiprack_2])
 
+    # Note: There seems to be an error in the opentrons labware library
+    # where the combined aluminium block + 200ul pcr plate has the wrong height.
+    # Instead, the combined aluminium block + 100ul pcr plate has a height 
+    # in the library within 0.1mm of a real block with a 200ul PCR plate
+    # (tested on 200ul BioRad and 200ul Armadillo plates).
+    # In other words, the protocol uses a 200ul plate despite telling the robot otherwise. 
+    well_plate = protocol.load_labware('opentrons_96_aluminumblock_nest_wellplate_100ul', 11)
+
     protocol.set_rail_lights(True)
     
+    # Pause on door open
     global paused
     paused = False
     global done
@@ -51,31 +61,29 @@ def run(protocol: protocol_api.ProtocolContext):
         if not paused and not protocol.door_closed:
             protocol.pause()
             paused = True
-        
         if paused and protocol.door_closed:
             protocol.resume()
             paused = False
-
         if paused and not protocol.door_closed:
             print('Protocol paused. Close the door to the robot to resume.')
 
         time.sleep(1)
-
         # Check if the main thread is still alive or if the run has been stopped by ctrl+C
         run_canceled = not threading.main_thread().is_alive()
-
         if not done and not run_canceled:
             check_pause()
 
     thread = threading.Thread(target=check_pause)
     thread.start()
 
+
+    # Start of robot movement
     for mm in mastermix_destination.keys():
         p10.pick_up_tip()
         for well in mastermix_destination[mm]:
             tube_rack = tube_racks[mastermix_source[mm][0]]
             p10.aspirate(6, tube_rack[mastermix_source[mm][1]])
-            p10.dispense(6, well_plate[well])
+            p10.dispense(7, well_plate[well]) #Dispense more than aspirated to minimize liquid left in the pipette. 
         p10.drop_tip()
 
 
