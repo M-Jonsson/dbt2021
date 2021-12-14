@@ -452,7 +452,7 @@ class Checkbox:
             self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
             self.image_name = 'Deck Images\\deck_qpcr.gif'
             self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
-            self.volumes_label = '4. Fill each tube rack according to its tab\n    The tabs can be selected on the row above the image\n\n5. Do not forget the alluminium block under the PCR plate'
+            self.volumes_label = '4. Fill each tube rack according to its tab\n    The tabs can be selected on the row above the image\n\n5. Do not forget the aluminum block under the PCR plate'
             self.info_text = '\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
             columns=math.ceil(num_samples/8)
