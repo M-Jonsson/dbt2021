@@ -134,13 +134,25 @@ class Bead_protocol_config():
         '''The purpuse of this function is to call the Checkbox() class, it checks the number of samples and uses
         deck_less_8.gif is the sample number is <8, otherwise it uses dec_96.gif'''
 
-        self.window = tk.Toplevel()
         sample_no = int(self.entry_sample_no.get())
         sample_vol = float(self.entry_sample_vol.get())
         ratio = float(self.entry_bead_ratio.get())
         EB=float(self.entry_eb.get()) 
         etoh=self.ethanol_var.get()
-        Checkbox(parent=self.window, protocol_type=protocol_dna_name, num_samples=sample_no, sample_vol=sample_vol, ratio=ratio, EB=EB, etoh=etoh)
+
+        if sample_no < 8:
+            self.image_path = 'Deck Images\\deck_less_8.gif'
+        else:
+            self.image_path = 'Deck Images\\deck_96.gif'
+
+        self.window = tk.Toplevel()
+        self.list_frame = ttk.Frame(self.window)
+        self.list_frame.grid(row=0, column=0)
+        self.image_frame = ttk.Frame(self.window)
+        self.image_frame.grid(row=0, column=1)
+
+        checkbox = Checkbox(parent=self.list_frame, protocol_type=protocol_dna_name, num_samples=sample_no, sample_vol=sample_vol, ratio=ratio, EB=EB, etoh=etoh)
+        checkbox.add_image(self.image_frame, self.image_path)
         self.window.grab_set()
 
     def ok_button(self):
@@ -269,16 +281,16 @@ class qPCR_protocol_config():
         self.frame_list = tk.Frame(self.window)
         self.frame_list.grid(row=0, column=0)
 
-        checkbox = Checkbox(parent=self.frame_list, protocol_type='qpcr')
+        checkbox = Checkbox(parent=self.frame_list, protocol_type='qpcr', qpcr_sources=self.sources, qpcr_destinations=self.destinations, qpcr_filepath=self.filepath)
 
         checkbox.add_tube_racks(self.window, self.sources, self.destinations)
         self.window.grab_set()
 
 
     def open_file_dialog(self):
-        filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
-        if filepath:
-            [self.destinations, self.sources] = replace_values_qpcr.csv_till_lista(filepath)
+        self.filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
+        if self.filepath:
+            [self.destinations, self.sources] = replace_values_qpcr.csv_till_lista(self.filepath)
             self._sources = self.sources
             replace_values_qpcr.replace_values_qpcr(self.destinations, self.sources)
 
@@ -287,7 +299,7 @@ class qPCR_protocol_config():
             self.estimate_button.config(state=tk.NORMAL)
             self.prepare_for_run.config(state=tk.NORMAL)
             # Show name of chosen file
-            self.file_name_label.config(text=filepath.split('/')[-1], foreground='green')
+            self.file_name_label.config(text=self.filepath.split('/')[-1], foreground='green')
 
     def get_estimate(self):
         run = subprocess.run(f"opentrons_simulate.exe -e {protocol_qpcr_local_filepath}{protocol_qpcr_name}", capture_output=True, text=True)
@@ -394,7 +406,7 @@ class Tube_rack_grid():
 
 class Checkbox:
     '''Checkbox class containing checkboxes and other stuff. very bare bones at the moment'''
-    def __init__(self, parent, protocol_type: str, num_samples=None, sample_vol=None, ratio=None, EB=None, etoh=None):
+    def __init__(self, parent, protocol_type: str, num_samples=None, sample_vol=None, ratio=None, EB=None, etoh=None, qpcr_sources=None, qpcr_destinations=None, qpcr_filepath=None):
         
         self.ip = ip1
         self.parent = parent
@@ -402,58 +414,94 @@ class Checkbox:
         self.frame.pack()
         self.protocol_type = protocol_type
 
+        # Differences in labels and 
         if self.protocol_type.startswith('qpcr'): # qPCR protocol'
             self.protocol = [protocol_qpcr_local_filepath, protocol_qpcr_name]
             self.image_name = 'Deck Images\\deck_qpcr.gif'
-            self.pipette_text = '\n     Left: P10 single-channel\n     Right: Any'
-            self.volumes_label = '4. Fill each tube rack according to its tab\n    The tabs can be selected on the row above the image\n\n5. Do not forget the aluminum block under the PCR plate'
-            self.info_text = '\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
+            self.pipette_text = '\n     Left: P10 single-channel\
+                \n     Right: Any'
+            self.volumes_label = '4. Fill each tube rack according to its tab\
+                \n    The tabs can be selected on the row above the image\
+                \n\n5. Do not forget the aluminum block under the PCR plate'
+            self.pause_info_text = '\n Pause the protocol by opening the robot door\
+                \n Resume the protocol by closing the robot door'
+
+            # Button calls lambda function which in turn calls the real function.
+            # Used to be able to pass arguments to the real function.
+            self.print_file_button = ttk.Button(self.frame, text='Print layout\n  to file', command=lambda: self.create_printable_file(qpcr_sources, qpcr_destinations, qpcr_filepath), style='my.small.TButton')
+
+            self.print_file_button.grid(row=22, column=1, padx=20, pady=10, ipadx=10, ipady=3)
+
         elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
             vol_etoh=etoh*200+100
+
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'Deck Images\\deck_96.gif'
-            self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     SPRI beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\n               '+ str(vol_etoh)+ ' μl per well'
-            self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
-            self.add_image(self.frame, self.image_name)
+            # self.image_name = 'Deck Images\\deck_96.gif'
+            self.pipette_text = '\n     Left: P10 8-channel\
+                \n     Right: P300 8-channel'
+            self.volumes_label = '     SPRI beads: '+str(beads)+' µl per well\
+                \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\
+                \n     EtOH: Fill the wells on the EtOH plate\n               corresponding to the wells with samples;\
+                \n               '+ str(vol_etoh)+ ' μl per well'
+            self.pause_info_text = '\n Pause the protocol by opening the robot door\
+                \n Resume the protocol by closing the robot door'
+            
+            self.image_frame = ttk.Frame(self.frame)
+            self.image_frame.grid(row=0, column=1)
+            # self.add_image(self.image_frame, self.image_name)
+
         elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
             vol_etoh=etoh*200+100
+            
             self.protocol = [protocol_local_filepath, protocol_dna_name]
-            self.image_name = 'Deck Images\\deck_less_8.gif'
-            self.pipette_text = '\n     Left: P10 8-channel\n     Right: P300 8-channel'
-            self.volumes_label = '\n     SPRI beads: '+str(beads)+' µl per well \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
-            self.info_text = '\n\n Pause the protocol by opening the robot door\n Resume the protocol by closing the robot door'
-            self.add_image(self.frame, self.image_name)
+            # self.image_name = 'Deck Images\\deck_less_8.gif'
+            self.pipette_text = '\n     Left: P10 8-channel\
+                \n     Right: P300 8-channel'
+            self.volumes_label = '     SPRI beads: '+str(beads)+' µl per well\
+                \n     Elution buffer: '+ str(vol_eb)+ ' μl per well\
+                \n     One Cleaning: Fill column 5 with 200µl EtOH on the liquids plate\
+                \n     Two Cleaning: Fill column 5 & 6 with 200µl EtOH on the liquids plate'
+            self.pause_info_text = '\n Pause the protocol by opening the robot door\
+                \n Resume the protocol by closing the robot door'
+            # self.add_image(self.frame, self.image_name)
+
         else:
             messagebox.showerror('Error', f"Invalid protocol type '{self.protocol_type}' entered.")
     
-
+        # Buttons
         self.connection_button = ttk.Button(self.frame, text='Check Connection', command= self.check_ssh, style='my.small.TButton')
-        self.connection_button.grid(row=3, column=1, rowspan=2, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
+        self.connection_button.grid(row=3, column=1, rowspan=2, padx=20, pady=10, ipadx=5, ipady=5, sticky=tk.W)
         
         self.run_protocol_button = ttk.Button(self.frame, text='Run Protocol', command= self.run_protocol, state='disabled', style='my.small.TButton')
-        self.run_protocol_button.grid(row=22, column= 2, padx=10, pady=10, ipadx=5, ipady=5, sticky=tk.E)
+        self.run_protocol_button.grid(row=22, column=2, padx=20, pady=10, ipadx=5, ipady=5, sticky=tk.W)
 
         self.quit_protocol_button = ttk.Button(self.frame, text='Exit', command= self.quit, style='my.small.TButton')
-        self.quit_protocol_button.grid(row=22, column= 1, padx=10, pady=10, ipadx=15, ipady=5, sticky=tk.E)
-        
-        self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font).grid(row=0, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
-        self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font).grid(row=5, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
-        self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font).grid(row=10, column=1, sticky=tk.W, padx=20, pady=20, columnspan=2)
+        self.quit_protocol_button.grid(row=22, column= 3, padx=20, pady=10, ipadx=10, ipady=5)
+
+        # Labels
+        self.label1 = ttk.Label(self.frame, text='1. Check the ssh-connection', font=font)
+        self.label1.grid(row=0, column=1, sticky=tk.W, padx=20, pady=10, columnspan=3)
+
+        self.label2 = ttk.Label(self.frame, text='2. Check the pipettes:' + self.pipette_text, font=font)
+        self.label2.grid(row=5, column=1, sticky=tk.W, padx=20, pady=10, columnspan=3)
+
+        self.label3 = ttk.Label(self.frame, text='3. Load the robot deck according to the picture', font=font)
+        self.label3.grid(row=10, column=1, sticky=tk.W, padx=20, pady=10, columnspan=3)
     
+        self.volumes = ttk.Label(self.frame, text=self.volumes_label, font=font)
+        self.volumes.grid(row=11, column=1, sticky=tk.W, padx=20, pady=10, columnspan=3)
 
-        self.volumes = ttk.Label(self.frame, text=self.volumes_label, font=font).grid(row=11, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
-
-        self.info = ttk.Label(self.frame, text=self.info_text, font=font,foreground='red').grid(row=20, column=1, sticky=tk.W, padx=20, pady=0, columnspan=2)
+        self.pause_info = ttk.Label(self.frame, text=self.pause_info_text, font=font,foreground='red')
+        self.pause_info.grid(row=20, column=1, sticky=tk.W, padx=20, pady=10, columnspan=3)
 
         self.connection_status = ttk.Label(self.frame, text='   Check connection\n     to continue', font=font, foreground= 'red')
-        self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
+        self.connection_status.grid(row=3, column=2, columnspan =2, sticky=tk.NW, padx=20, pady=0)
 
     def add_image(self, parent, image_path):
         self.image = tk.PhotoImage(file=image_path)
@@ -472,7 +520,6 @@ class Checkbox:
 
         base.fill_notebook(sources, destinations)
 
-
     def check_ssh(self):
         '''Checks if it is possible to connect by SSH.
         Creates a Queue object and passes it to a Process subclass, Threaded_ssh_check().
@@ -484,13 +531,13 @@ class Checkbox:
         If not, checks again in 3 seconds. 
         '''
 
-        self.connection_status.config(text='      Checking connection...', foreground='black')
+        self.connection_status.config(text='    Checking connection...', foreground='black')
         self.connection_status.update()
         
         self.valid_connection = False
 
         self.connection_progress = ttk.Progressbar(self.frame, orient=tk.HORIZONTAL, length=200, mode='indeterminate', )
-        self.connection_progress.grid(row=4, column=2)
+        self.connection_progress.grid(row=4, column=2, padx=10, columnspan=2, sticky=tk.W)
         self.connection_progress.start(10)
         self.connection_progress.update()
 
@@ -502,8 +549,7 @@ class Checkbox:
         self.process.start()
 
         self.connection_progress.after(1000, self.try_connection)
-
-        
+     
     def try_connection(self):
         try:
             # valid_connection = True
@@ -514,28 +560,28 @@ class Checkbox:
         else:
             if not valid_connection:
                 self.connection_button.config(state=tk.NORMAL)
-                self.connection_status.config(text='Connection failed', foreground='red')
+                self.connection_status.config(text='   Connection failed', foreground='red')
                 self.connection_progress.destroy()
                 self.change_ip()
                 
             elif valid_connection:
                 self.connection_button.config(state=tk.NORMAL)
                 self.run_protocol_button.config(state=tk.NORMAL)
-                self.connection_status.config(text='Connection OK', foreground='green')
+                self.connection_status.config(text='   Connection OK', foreground='green')
                 self.connection_progress.destroy()
 
                 print('Preparing robot to run by stopping opentrons-robot-server')
                 subprocess.run(f'ssh -i {key_filename} {username}@{self.ip} -t "sh -lic" \'systemctl stop opentrons-robot-server\'')
-
-        
+     
     def run_protocol(self):
-        '''Uploads the new protocol using 
+        '''Uploads and launches the new protocol using 
         scp -i <key> <file_to_upload> <where_to_place_it>
-        Then launches the new protocol using
-        ssh -i <key> <login> -t "sh -lic" <command> -t creates a pseudo terminal on the remote machine (?)
-        sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
-        which is required to initialize everything correctly.
-        Else the robot cannot use any labware or find calibration data. 
+        and ssh -i <key> <login> -t "sh -lic" <command> 
+        
+        -t "sh -lic" is required for initialization, 
+        else the robot cannot find calibration data or recognize modules. 
+        -t creates a pseudo terminal,
+        sh -lic makes the command (c) run in an interactive (i) and login (l) shell.
         '''
         
         # Upload the new protocol using 
@@ -630,6 +676,51 @@ class Checkbox:
         elif self.ip == ip2:
             self.ip = ip1
   
+    def create_printable_file(self, sources: dict, destinations: dict, filepath_csv: str):
+        '''Creates a .txt file showing the volume needed for each
+        mastermix, sample and stadard, as well as how to place it
+        on the tube racks/cooling blocks.
+        Saves the file in the same directory as the .csv it is based on.
+
+            Parameters:
+                sources (dictionary):       Dictionary of source wells (tube racks).
+                destinations (dicitonary):  Dicitonary of destination wells (PCR plate).
+                filepath_csv (str):         Filepath of .csv that the protocol is based on.
+
+            Returns:
+                Nothing.
+        '''
+        filepath_base = filepath_csv.split('/')[:-1]
+        original_file = filepath_csv.split('/')[-1].split('.')[0]
+        new_file = f'qpcr_robot_layout_{original_file}.txt'
+        filepath_output = '/'.join(filepath_base) + '/' + new_file
+        print(filepath_output)
+
+        with open(filepath_output, 'w') as file:
+            file.write(f'Robot preparation based on {original_file}.csv.\n')
+            file.write('    Note: The volumes shown are for N+3 reactions.\n\n')
+            for type in destinations.keys():
+                if type.startswith('mastermix'):
+                    file.write('Mastermixes:\n')
+                    vol = 6
+                    source_key = 'mastermix_source'
+                if type.startswith('sample'):
+                    file.write('Samples:\n')
+                    vol = 4
+                    source_key = 'sample_source'
+                if type.startswith('standard'):
+                    file.write('Standards:\n')
+                    vol = 4
+                    source_key = 'standard_source'
+
+                for mixture in destinations[type]:
+                    [source_tuberack, source_well] = sources[source_key][mixture]
+                    wells_num = len(destinations[type][mixture])
+                    file.write(f'    {mixture}\
+                        \n        Total volume: {vol*(wells_num+3)} ul        Place on {source_tuberack}, column {source_well[1]}, row {source_well[0]}.\n')
+
+        messagebox.showinfo('Created printable file', f'A .txt file with a summary of the needed volumes has been placed in the same folder as the earlier provided .csv file.\n\nFile location:\n{filepath_output}', parent=self.parent)
+   
 class Threaded_ssh_check(multiprocessing.Process):
     def __init__(self, queue, ip):
         super().__init__()
