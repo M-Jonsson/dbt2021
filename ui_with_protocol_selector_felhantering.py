@@ -1,3 +1,19 @@
+####################################
+#   Tkinter GUI for the DNA purification protocol using SPRI beads and the qPCR protocol.
+#
+#   Authors: Group 5 Design-Build-Test 2021:
+#           Elsa Renström    
+#           Agata Jasna
+#           Tiam Fitoon
+#           Mathias Jonsson
+#           Johan Lehto
+#           Johan Lundberg 
+#      
+#   Version information:
+#           v1.1 2021-12-10: Refined after quality controls.
+#           v1.2 2021-12-XX: Added comments.
+#
+####################################
 
 import os
 import sys
@@ -209,8 +225,7 @@ class Bead_protocol_config():
 
     def ok_button(self):
         """ 
-        Checks if all entries are valid.
-        If valid, will create a modified protocol with the value given by the user 
+        Checks if all entries are valid. If valid, will create a modified protocol with the value given by the user 
         (done by the replace_values() function to edit an existing protocol blueprint).
 
             Parameters:
@@ -479,7 +494,7 @@ class Tube_rack_base():
 
             Parameters:
                 self:           allows the function to access class attributes and methods
-                title:          the name of the new tab in the notebook
+                title (str):          the name of the new tab in the notebook
 
             Returns:
                 self.tab_frame 
@@ -495,8 +510,8 @@ class Tube_rack_base():
 
             Parameters:
                 self:           allows the function to access class attributes and methods
-                sources:        dictionary containing sources for msatermixes, samples and standards
-                destinations:   dictionary containing destinations for mastermixes, samples and standards
+                sources (dict):        dictionary containing sources for msatermixes, samples and standards
+                destinations (dict):   dictionary containing destinations for mastermixes, samples and standards
 
             Returns:
                 Nothing.
@@ -583,9 +598,9 @@ class Tube_rack_grid():
         Constructs Tkinter class variables for the Tube_rack_grid() object.
 
             Parameters:
-                self:           which window/frame to add the grid to
-                xy:             --
-                new_text        --
+                self:                   which window/frame to add the grid to
+                xy ():                  --
+                new_text (str):         --
         
             Returns:
                 Nothing.
@@ -602,7 +617,34 @@ class Tube_rack_grid():
                 break
 
 class Checkbox:
-    '''Checkbox class containing checkboxes and other stuff. very bare bones at the moment'''
+    """
+    Creates the Checkbox window.
+
+        Attributes:
+            parent:                 which frame/window to add the notebook to
+            ip (str):               the ip to the OT-2 robot
+            protocol_type (str):    either the qPCR or  the DNA purification protocol
+        
+        Methods:
+            add_image():
+                --
+            add_tube_racks():
+                --
+            check_ssh():
+                --
+            try_connection():
+                --
+            run_protocol():
+                --
+            scp_transfer():
+                --
+            execute_run():
+                --
+            quit():
+                --
+            change_ip():
+                --
+    """
     def __init__(self, parent, protocol_type: str, num_samples=None, sample_vol=None, ratio=None, EB=None, etoh=None):
         
         self.ip = ip1
