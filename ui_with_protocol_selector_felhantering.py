@@ -30,9 +30,8 @@ font = (16)
 
 class Selector():
     """
-    Creates a frame with widgets used to select which protocol to run.
-    The frame will be added to the root window when initialized and destroyed (closed)
-    when another class containing a new frame is called. 
+    Creates a frame with widgets used to select which protocol to run. The frame will be added to the root window when 
+    initialized and destroyed (closed) when another class containing a new frame is called. 
 
         Attributes:
             --
@@ -50,7 +49,7 @@ class Selector():
         Constructs Tkinter class variables for the Selector() object.
 
             Parameters:
-                --
+                self:           allows the function to access class attributes and methods
         
             Returns:
                 Nothing.
@@ -78,12 +77,11 @@ class Selector():
 
     def select_protocol_beads(self):
         """
-        Closes the frame created by the Selector() class, but not the root window.
-        Then creates a new frame from the Bead_protocol_config() class for editing a 
-        magnetic bead DNA purification protocol.
+        Closes the frame created by the Selector() class, but not the root window. Then creates a new frame 
+        from the Bead_protocol_config() class for editing a magnetic bead DNA purification protocol.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -98,7 +96,7 @@ class Selector():
         Then creates a new frame with the qPCR_protocol_config() class.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -134,7 +132,7 @@ class Bead_protocol_config():
         Constructs Tkinter class variables for the Bead_protocol_config() object.
 
             Parameters:
-                --
+                self:           allows the function to access class attributes and methods
         
             Returns:
                 Nothing.
@@ -193,7 +191,7 @@ class Bead_protocol_config():
         The purpuse of this function is to call the Checkbox() class with the entered values as arguments.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -216,7 +214,7 @@ class Bead_protocol_config():
         (done by the replace_values() function to edit an existing protocol blueprint).
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -294,11 +292,10 @@ class Bead_protocol_config():
         time estimate feature enabled (-e flag). Shows the result in a message box.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing 
-
         """
         run = subprocess.run(f"opentrons_simulate.exe -e {protocol_local_filepath}{protocol_dna_name}", capture_output=True, text=True)
         self.beads_estimate = run.stdout.split('\n')[-4]
@@ -310,20 +307,18 @@ class Bead_protocol_config():
         by calling the Selector() class.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing 
-
         """
         self.frame.destroy()
         Selector()
 
 class qPCR_protocol_config():
     """
-    Creates a frame with widgets used for the qPCR protocol. 
-    The frame will be added to the root window when initialized and destroyed (closed)
-    when another class containing a new frame is called. 
+    Creates a frame with widgets used for the qPCR protocol. The frame will be added to the root window when initialized 
+    and destroyed (closed) when another class containing a new frame is called. 
 
         Attributes:
             --
@@ -337,14 +332,13 @@ class qPCR_protocol_config():
                 Simulates the protocol to get an estimate of how long it will take to run the protocol.
             back_button():
                 Closes the current frame and opens the a new frame from the Selector() class
-
     """
     def __init__(self):
         """
         Constructs Tkinter class variables for the qPCR_protocol_config() object.
 
             Parameters:
-                --
+                self:           allows the function to access class attributes and methods
         
             Returns:
                 Nothing.
@@ -383,11 +377,10 @@ class qPCR_protocol_config():
         The purpuse of this function is to call the Checkbox() class with parent frame and protocol type as arguments.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing
-
         """
 
         self.window = tk.Toplevel()
@@ -407,11 +400,10 @@ class qPCR_protocol_config():
         for the qPCR protcol.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing
-
         """
         filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
         if filepath:
@@ -432,11 +424,10 @@ class qPCR_protocol_config():
         time estimate feature enabled (-e flag). Shows the result in a message box.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
 
             Returns:
                 Nothing 
-
         """
         run = subprocess.run(f"opentrons_simulate.exe -e {protocol_qpcr_local_filepath}{protocol_qpcr_name}", capture_output=True, text=True)
         self.qPCR_estimate = run.stdout.split('\n')[-4]
@@ -463,7 +454,6 @@ class Tube_rack_base():
                 Simulates the protocol to get an estimate of how long it will take to run the protocol.
             back_button():
                 Closes the current frame and opens the a new frame from the Selector() class
-
     """
     def __init__(self, parent):
         """
@@ -488,18 +478,29 @@ class Tube_rack_base():
         This function adds another tab to the tube rack notebook.
 
             Parameters:
-                Self:           allows the function to access class attributes and methods
+                self:           allows the function to access class attributes and methods
                 title:          the name of the new tab in the notebook
 
             Returns:
                 self.tab_frame 
-
         """
         self.tab_frame = tk.Frame(self.notebook)
         self.notebook.add(self.tab_frame, text=title)
         return self.tab_frame
 
     def fill_notebook(self, sources, destinations):
+        """
+        This function loops through mastermix, samples and standard dictionaries and checks how many
+        tabs in the notebook are needed.
+
+            Parameters:
+                self:           allows the function to access class attributes and methods
+                sources:        dictionary containing sources for msatermixes, samples and standards
+                destinations:   dictionary containing destinations for mastermixes, samples and standards
+
+            Returns:
+                Nothing.
+        """
         # Variable to keep track of the loops
         tube_racks = []
 
@@ -537,11 +538,26 @@ class Tube_rack_base():
                 trg.edit(well, text)
     
 class Tube_rack_grid():
-    '''Tube rack layout grid used to populate the base notebook.
-    __init__ creates a base layout which can then be edited with edit()
-    to add the "real" values.  
-    '''
+    """
+    Creates a tube rack layout grid used in the base notebook and its tabs.
+
+        Attributes:
+            parent:         which frame/window to add the tube rack grid to
+        
+        Methods:
+            edit():
+                123
+    """
     def __init__(self, parent):
+        """
+        Constructs Tkinter class variables for the Tube_rack_grid() object.
+
+            Parameters:
+                parent:         which window/frame to add the grid to
+        
+            Returns:
+                Nothing.
+        """
         # Creates a frame assigned to the specified parent widget
         self.parent = parent
         self.frame = tk.Frame(parent)
@@ -563,6 +579,17 @@ class Tube_rack_grid():
                 ttk.Label(self.frame, text='Empty', foreground='black', justify='center').grid(row=i+1, column=j+1, padx=20, pady=20)
 
     def edit(self, xy, new_text):
+        """
+        Constructs Tkinter class variables for the Tube_rack_grid() object.
+
+            Parameters:
+                self:           which window/frame to add the grid to
+                xy:             --
+                new_text        --
+        
+            Returns:
+                Nothing.
+        """
         row_index_to_letter = {0:None, 1:'A', 2:'B', 3:'C', 4:'D'}
         # Loop through each label on the grid
         for child_values in self.frame.children.values():
