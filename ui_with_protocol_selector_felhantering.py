@@ -57,7 +57,6 @@ class Selector():
                 Creates the frame used for editing the magnetic bead DNA purification protocol.
             select_protocol_qpcr():
                 Creates the frame used for the qPCR protocol.
-
     """
 
     def __init__(self):
@@ -140,7 +139,6 @@ class Bead_protocol_config():
                 Simulates the protocol to get an estimate of how long it will take to run the protocol.
             back_button():
                 Closes the current frame and opens the a new frame from the Selector() class
-
     """
 
     def __init__(self):
@@ -211,7 +209,6 @@ class Bead_protocol_config():
 
             Returns:
                 Nothing
-
         """
 
         self.window = tk.Toplevel()
@@ -233,7 +230,6 @@ class Bead_protocol_config():
 
             Returns:
                 Nothing
-
         """
 
         try:
