@@ -489,7 +489,7 @@ class Tube_rack_base():
         This function adds another tab to the tube rack notebook.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:                 allows the function to access class attributes and methods
                 title (str):          the name of the new tab in the notebook
 
             Returns:
@@ -505,7 +505,7 @@ class Tube_rack_base():
         tabs in the notebook are needed.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:                  allows the function to access class attributes and methods
                 sources (dict):        dictionary containing sources for msatermixes, samples and standards
                 destinations (dict):   dictionary containing destinations for mastermixes, samples and standards
 
