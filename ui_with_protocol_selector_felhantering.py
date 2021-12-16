@@ -614,7 +614,8 @@ class Tube_rack_grid():
 
 class Checkbox:
     """
-    Creates the Checkbox window.
+    Creates the Checkbox window and checks from which protocol it was launched from, in order to load the correct
+    information.
 
         Attributes:
             parent:                 which frame/window to add the notebook to
@@ -623,19 +624,19 @@ class Checkbox:
         
         Methods:
             add_image():
-                --
+                Adds an image of the robot deck to the checkbox window.
             add_tube_racks():
-                --
+                Adds the notebook for tube racks as well as the image of the robot deck, if the protocol is qPCR.
             check_ssh():
-                --
+                Creates a Queue object used to determine if a ssh connection can be established.
             try_connection():
-                --
+                Checks if the Queue object is empty, i.e a connection was established.
             run_protocol():
-                --
+                Uploads the protocol to the robot and runs it.
             scp_transfer():
-                --
+                Function used for multiprocessing, uploads the protocol to the robot. If it takes too long it times out.
             execute_run():
-                --
+                Runs the protocol
             quit():
                 --
             change_ip():
