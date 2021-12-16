@@ -1,9 +1,29 @@
+####################################
+#   qPCR preparation protocl using the Opentons OT-2 pipetting robot.
+#
+#   Authors: Group 5 Design-Build-Test 2021:
+#           Elsa Renström    
+#           Agata Jasna
+#           Tiam Fitoon
+#           Mathias Jonsson
+#           Johan Lehto
+#           Johan Lundberg 
+#      
+#   Version information:
+#           v1.1 2021-12-10: Refined after quality controls.
+#
+####################################
+
 import json
 from opentrons import protocol_api
 import time
 import threading
 
 metadata = {'apiLevel': '2.10'}
+
+####################################
+#============RUN FUNCTION===========
+####################################
 
 def run(protocol: protocol_api.ProtocolContext):
 
@@ -56,6 +76,16 @@ def run(protocol: protocol_api.ProtocolContext):
     done = False
 
     def check_pause():
+        """
+        Pause function that checks if the robot door is closed or not, if it is open the protocol is paused
+        and you have to close the door again to resume.
+
+        Parameters:
+            None.
+        
+        Returns:
+            Nothing.
+        """
         global paused
         global done
         if not paused and not protocol.door_closed:
@@ -76,8 +106,10 @@ def run(protocol: protocol_api.ProtocolContext):
     thread = threading.Thread(target=check_pause)
     thread.start()
 
+    #########################
+    ###START PROTOCOL########
+    #########################
 
-    # Start of robot movement
     for mm in mastermix_destination.keys():
         p10.pick_up_tip()
         for well in mastermix_destination[mm]:
