@@ -632,17 +632,33 @@ class Checkbox:
             try_connection():
                 Checks if the Queue object is empty, i.e a connection was established.
             run_protocol():
-                Uploads the protocol to the robot and runs it.
+                Uploads the protocol using the scp_transfer() function and then executes the run. Times out if it takes longer than 5 seconds.
+                Also checks if the protocol was completed successfully or not.
             scp_transfer():
-                Function used for multiprocessing, uploads the protocol to the robot. If it takes too long it times out.
+                Function used for multiprocessing, uploads the protocol to the robot, used in the run_protocol() function.
             execute_run():
-                Runs the protocol
+                Runs the protocol on the robot, used in the run_protocol() function.
             quit():
-                --
+                Asks the user if they want to exit the program, if yes, quits in a safe manner.
             change_ip():
-                --
+                A function that changes between the two most common ip-addresses to the robot.
     """
     def __init__(self, parent, protocol_type: str, num_samples=None, sample_vol=None, ratio=None, EB=None, etoh=None):
+        """
+        Constructs Tkinter class variables, methods and parameters needed for the Checkbox() object.
+
+            Parameters:
+                parent:                     Which window/frame to add the checkbox to
+                protocol_type (str):        The protocol
+                num_samples (int):          The number of samples
+                sample_vol (int):           Volume of one sample
+                ratio (float):              The sample/SPRI-bead ratio
+                EB (int):                   Amount of EB used for elution
+                etoh (int):                 Number of ethanol washes
+        
+            Returns:
+                Nothing.
+        """
         
         self.ip = ip1
         self.parent = parent
