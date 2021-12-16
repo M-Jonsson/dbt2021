@@ -11,7 +11,6 @@
 #      
 #   Version information:
 #           v1.1 2021-12-10: Refined after quality controls.
-#           v1.2 2021-12-XX: Added comments.
 #
 ####################################
 
@@ -64,7 +63,7 @@ class Selector():
         Constructs Tkinter class variables for the Selector() object.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
         
             Returns:
                 Nothing.
@@ -96,7 +95,7 @@ class Selector():
         from the Bead_protocol_config() class for editing a magnetic bead DNA purification protocol.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -111,7 +110,7 @@ class Selector():
         Then creates a new frame with the qPCR_protocol_config() class.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -146,7 +145,7 @@ class Bead_protocol_config():
         Constructs Tkinter class variables for the Bead_protocol_config() object.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
         
             Returns:
                 Nothing.
@@ -202,10 +201,10 @@ class Bead_protocol_config():
     
     def call_checkbox_beads(self):
         """
-        The purpuse of this function is to call the Checkbox() class with the entered values as arguments.
+        The purpuse of this function is to create a Checkbox() object with the entered values as arguments.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -226,7 +225,7 @@ class Bead_protocol_config():
         (done by the replace_values() function to edit an existing protocol blueprint).
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -303,7 +302,7 @@ class Bead_protocol_config():
         time estimate feature enabled (-e flag). Shows the result in a message box.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing 
@@ -318,7 +317,7 @@ class Bead_protocol_config():
         by calling the Selector() class.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing 
@@ -349,7 +348,7 @@ class qPCR_protocol_config():
         Constructs Tkinter class variables for the qPCR_protocol_config() object.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
         
             Returns:
                 Nothing.
@@ -388,7 +387,7 @@ class qPCR_protocol_config():
         The purpuse of this function is to call the Checkbox() class with parent frame and protocol type as arguments.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -411,7 +410,7 @@ class qPCR_protocol_config():
         for the qPCR protcol.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing
@@ -435,7 +434,7 @@ class qPCR_protocol_config():
         time estimate feature enabled (-e flag). Shows the result in a message box.
 
             Parameters:
-                self:           allows the function to access class attributes and methods
+                self:           Allows the function to access class attributes and methods
 
             Returns:
                 Nothing 
@@ -454,7 +453,7 @@ class Tube_rack_base():
     Parent is which window to add it to.
 
         Attributes:
-            parent:         which frame/window to add the notebook to
+            parent:         Which frame/window to add the notebook to
         
         Methods:
             call_checkbox_beads():
@@ -489,8 +488,8 @@ class Tube_rack_base():
         This function adds another tab to the tube rack notebook.
 
             Parameters:
-                self:                 allows the function to access class attributes and methods
-                title (str):          the name of the new tab in the notebook
+                self:                 Allows the function to access class attributes and methods
+                title (str):          The name of the new tab in the notebook
 
             Returns:
                 self.tab_frame 
@@ -505,9 +504,9 @@ class Tube_rack_base():
         tabs in the notebook are needed.
 
             Parameters:
-                self:                  allows the function to access class attributes and methods
-                sources (dict):        dictionary containing sources for msatermixes, samples and standards
-                destinations (dict):   dictionary containing destinations for mastermixes, samples and standards
+                self:                  Allows the function to access class attributes and methods
+                sources (dict):        Dictionary containing sources for msatermixes, samples and standards
+                destinations (dict):   Dictionary containing destinations for mastermixes, samples and standards
 
             Returns:
                 Nothing.
@@ -553,18 +552,18 @@ class Tube_rack_grid():
     Creates a tube rack layout grid used in the base notebook and its tabs.
 
         Attributes:
-            parent:         which frame/window to add the tube rack grid to
+            parent:         Which frame/window to add the tube rack grid to
         
         Methods:
             edit():
-                123
+                Description
     """
     def __init__(self, parent):
         """
         Constructs Tkinter class variables for the Tube_rack_grid() object.
 
             Parameters:
-                parent:         which window/frame to add the grid to
+                parent:         Which window/frame to add the grid to
         
             Returns:
                 Nothing.
@@ -594,7 +593,7 @@ class Tube_rack_grid():
         Constructs Tkinter class variables for the Tube_rack_grid() object.
 
             Parameters:
-                self:                   which window/frame to add the grid to
+                self:                   Which window/frame to add the grid to
                 xy ():                  --
                 new_text (str):         --
         
@@ -618,9 +617,9 @@ class Checkbox:
     information.
 
         Attributes:
-            parent:                 which frame/window to add the notebook to
-            ip (str):               the ip to the OT-2 robot
-            protocol_type (str):    either the qPCR or  the DNA purification protocol
+            parent:                 Which frame/window to add the notebook to
+            ip (str):               The ip to the OT-2 robot
+            protocol_type (str):    Either the qPCR or the DNA purification protocol
         
         Methods:
             add_image():
@@ -630,7 +629,7 @@ class Checkbox:
             check_ssh():
                 Creates a Queue object used to determine if a ssh connection can be established.
             try_connection():
-                Checks if the Queue object is empty, i.e a connection was established.
+                Checks if an item is returned from the Queue object, i.e a connection was established.
             run_protocol():
                 Uploads the protocol using the scp_transfer() function and then executes the run. Times out if it takes longer than 5 seconds.
                 Also checks if the protocol was completed successfully or not.
@@ -720,11 +719,33 @@ class Checkbox:
         self.connection_status.grid(row=3, column=2, sticky=tk.W, padx=20, pady=20)
 
     def add_image(self, parent, image_path):
+        """
+        Adds an image to the checkbox window.
+
+            Parameters:
+                self:                   Allows the function to access class attributes and methods
+                image_path (str):       The filepath to the image
+                parent:                 Which window/frame to add the checkbox to
+        
+            Returns:
+                Nothing.
+        """
         self.image = tk.PhotoImage(file=image_path)
         self.img_label = ttk.Label(parent, image=self.image)
         self.img_label.grid(row=0, column=5, rowspan=30) # Show imgage on frame
     
     def add_tube_racks(self, parent, sources, destinations):
+        """
+        Adds the image and the notebook for tube racks to the checkbox object, used for qPCR.
+
+            Parameters:
+                self:                   Allows the function to access class attributes and methods
+                image_path (str):       The filepath to the image
+                parent:                 Which window/frame to add the checkbox to
+        
+            Returns:
+                Nothing.
+        """
         self.parent = parent
         self.frame_tube_racks = tk.Frame(self.parent)
         self.frame_tube_racks.grid(row=0, column=1)
@@ -738,15 +759,19 @@ class Checkbox:
 
 
     def check_ssh(self):
-        '''Checks if it is possible to connect by SSH.
-        Creates a Queue object and passes it to a Process subclass, Threaded_ssh_check().
-        The queue creates a connection between the main process (the UI) and this new process.
-        When the process is started, its run() method is executed,
-        which tries to create a socket connection to the robot ip.
-        After 1 second, calls try_connection() to check if the queue is empty,
-        i.e. if the attempts at creating a socket conneciton is finished.
-        If not, checks again in 3 seconds. 
-        '''
+        """
+        Checks if it is possible to connect by SSH. Creates a Queue object and passes it to a Process subclass, Threaded_ssh_check().
+        The queue creates a connection between the main process (the UI) and this new process. When the process is started, 
+        its run() method is executed, which tries to create a socket connection to the robot ip.
+        After 1 second, calls try_connection() to check if the queue is empty, i.e. if the attempts at creating a socket conneciton is 
+        finished. If not, checks again in 3 seconds.
+            
+            Parameters:
+                self:                   Allows the function to access class attributes and methods
+        
+            Returns:
+                Nothing. 
+        """
 
         self.connection_status.config(text='      Checking connection...', foreground='black')
         self.connection_status.update()
@@ -769,6 +794,17 @@ class Checkbox:
 
         
     def try_connection(self):
+        """
+        Checks if a connection can be established and prepares the robot for running a protocol. If an item was returned by the get_nowait()
+        function then a connection was established. If no item was returned and the Empty exception wasn't raised, then a connection couldn't
+        be established. If the Empty exception is raised it tries to establish a connection again after 3 seconds.
+            
+            Parameters:
+                self:                   Allows the function to access class attributes and methods
+        
+            Returns:
+                Nothing. 
+        """
         try:
             # valid_connection = True
             valid_connection = self.queue.get_nowait()
@@ -793,14 +829,19 @@ class Checkbox:
 
         
     def run_protocol(self):
-        '''Uploads the new protocol using 
-        scp -i <key> <file_to_upload> <where_to_place_it>
-        Then launches the new protocol using
-        ssh -i <key> <login> -t "sh -lic" <command> -t creates a pseudo terminal on the remote machine (?)
-        sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
-        which is required to initialize everything correctly.
-        Else the robot cannot use any labware or find calibration data. 
-        '''
+        """
+        Uploads the new protocol using: scp -i <key> <file_to_upload> <where_to_place_it>
+        Then launches the new protocol using: ssh -i <key> <login> -t "sh -lic" <command> -t
+        The sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
+        which is required to initialize everything correctly. Else the robot cannot use 
+        any labware or find calibration data. 
+
+            Parameters:
+                self:                   Allows the function to access class attributes and methods
+        
+            Returns:
+                Nothing. 
+        """
         
         # Upload the new protocol using 
         # scp -i <key> <file_to_upload> <where_to_place_it>
@@ -837,21 +878,32 @@ class Checkbox:
     
     # Small function to enable multiprocessing later - used only for error-checking.
     def scp_transfer(self, protocol):
+        """
+        Function required for the multiprocessing process that uploads the protocol to the robotm used in the 
+        run_protocol() function.
+
+            Parameters:
+                self:                   Allows the function to access class attributes and methods
+                protocol (str):         The protocol that is uploaded to the robot.
+        
+            Returns:
+                Literally nothing. 
+        """
         subprocess.run(f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{self.ip}:{protocol_robot_filepath}{protocol[1]}')
         return  
 
     def execute_run(self):
-        '''Starts the robot by calling for 'opentrons_execute' over SSH using a subprocess.
+        """
+        Starts the robot by calling for 'opentrons_execute' over SSH using a subprocess.
         Saves the output in a log, which is also continuously printed so that it is also visible
         to the user. 
 
             Parameters:
-                None.
+                self:               Allows the function to access class attributes and methods
             
             Returns:
-                log (list):     Output from the subprocess as a list. 
-
-        '''
+                log (list):         Output from the subprocess as a list. 
+        """
         # Start subprocess to run command over SSH.
         command = f'ssh -i {key_filename} {username}@{self.ip} -t "sh -lic" \'opentrons_execute {protocol_robot_filepath}{self.protocol[1]}\''
         process = subprocess.Popen(command, stdout=subprocess.PIPE, text=True)
@@ -862,16 +914,16 @@ class Checkbox:
         return log
 
     def quit(self):
-        '''Restarts the opentrons-robot-server before closing the program
+        """
+        Restarts the opentrons-robot-server before closing the program
         if the user chooses "yes" when asked.
 
             Parameters:
-                None.
+                self:               Allows the function to access class attributes and methods
             
             Returns:
                 Nothing.
-
-        '''
+        """
         exit_choice = messagebox.askyesno('Quitting', 'This will close the program and prepare the robot to shut down.\nDo you want to continue?', parent=self.parent)
         if exit_choice:
             print('Shutting down...')
@@ -879,28 +931,57 @@ class Checkbox:
             sys.exit(0)
     
     def change_ip(self):
-        '''Alternates between the two most common ip addresses.
+        """
+        Alternates between the two most common ip addresses.
         Made for if the ssh_check fails in order to try another next attempt.
 
             Parameters:
-                None.
+                self:               Allows the function to access class attributes and methods
             
             Returns:
                 Nothing.
-
-        '''
+        """
         if self.ip == ip1:
             self.ip = ip2
         elif self.ip == ip2:
             self.ip = ip1
   
 class Threaded_ssh_check(multiprocessing.Process):
+    """
+    Description
+
+        Attributes:
+            --
+        
+        Methods:
+            --
+    """
     def __init__(self, queue, ip):
+        """
+        Description
+
+            Parameters:
+                self:               Allows the function to access class attributes and methods
+                queue ():
+                ip (str):
+            
+            Returns:
+                Nothing.
+        """
         super().__init__()
         self.queue = queue
         self.ip = ip
     
     def run(self):
+        """
+        Description
+
+            Parameters:
+                self:               Allows the function to access class attributes and methods
+            
+            Returns:
+                Nothing.
+        """
         host = self.ip
         port = 22
         try:
@@ -916,6 +997,16 @@ class Threaded_ssh_check(multiprocessing.Process):
 
 
 def run_gui():
+    """
+    The main function that creates the Tkinter main window. Also calls the Selector() class. Raises an error if the ssh-key
+    can't be found
+
+        Parameters:
+            Nothing.
+            
+        Returns:
+            Nothing.
+    """
     # Creates a root window
     root = tk.Tk()
     root.title('Protocol selector')
