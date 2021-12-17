@@ -428,6 +428,7 @@ class qPCR_protocol_config():
         self.filepath = filedialog.askopenfilename(filetypes=(('CSV files','*.csv'),))
         if self.filepath:
             [self.destinations, self.sources] = replace_values_qpcr.csv_till_lista(self.filepath)
+
             self._sources = self.sources
             replace_values_qpcr.replace_values_qpcr(self.destinations, self.sources)
 
@@ -487,7 +488,7 @@ class Tube_rack_base():
 
             Parameters:
                 parent:         Which frame/window to add the notebook to
-        
+
             Returns:
                 Nothing.
         """
@@ -675,7 +676,7 @@ class Checkbox:
                 qpcr_sources (dict):        Which well has which mixture on which tube rack in qPCR protocols.
                 qpcr_destinations(dict):    Which well on the PCR plate will get which mixture in qPCR protocols. 
                 qpcr_filepath(dict):        Filepath to the .csv file that a qPCR protocol gets made from. 
-        
+
             Returns:
                 Nothing.
         """
@@ -799,7 +800,7 @@ class Checkbox:
                 self:                   Allows the function to access class attributes and methods
                 parent:                 Which window/frame to add the checkbox to
                 sources (dict):         Dictionary of which well on which tube rack each mixture is taken from.
-                destinations (dict):      Dictionary of which well on the PCR each mixture is to be added to.
+                destinations (dict):    Dictionary of which well on the PCR each mixture is to be added to.
         
             Returns:
                 Nothing.
@@ -935,6 +936,7 @@ class Checkbox:
     def scp_transfer(self, protocol):
         """
         Function required for the multiprocessing process that uploads the protocol to the robot used in the 
+
         run_protocol() function.
 
             Parameters:
