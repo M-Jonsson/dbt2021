@@ -1,24 +1,49 @@
+####################################
+#   Functions used to create the qPCR protocol and the required dictionaries containing 
+#   source and destination information for samples, mastermixes and standards.
+#
+#   Authors: Group 5 Design-Build-Test 2021:
+#           Elsa Renström    
+#           Agata Jasna
+#           Tiam Fitoon
+#           Mathias Jonsson
+#           Johan Lehto
+#           Johan Lundberg 
+#      
+#   Version information:
+#           v1.1 2021-12-17: Added documentation
+#
+####################################
+
 import csv
 from shutil import copyfile
 from os import getlogin
 
+"""
+                        --IMPORTANT NOTICE--
+
+These functions are designed to work with csv-files with a specific layout. 
+"""
 
 def csv_till_lista(filepath):
-    '''Takes a .csv file as input and finds which wells to distribute each
+    """
+    Takes a .csv file as input and finds which wells to distribute each
     mastermix, standard and sample. Also determines how to place each source on a tube rack. 
 
     The information is stored in a separate dictionary for mastermixes, standards and samples,
     as well as separate dictionaries for destination wells and source wells. Everything is then
     stored again as a dictionary of dictionaries to save which dictionary corresponds to what. 
-    
-    Returns a list with all dictionaries at position 0 and only the source dictionaries at position 1. 
-    '''
+
+        Parameters:
+            filepath (str):             The filepath to the csv file
+
+        Returns:
+            Two dictionaries, one containing mastermix, standard and sample destitnations (wells) and the other dictionary
+            contains the corresponding sources (positions on tube racks). 
+    """
 
     with open(filepath, 'r') as csv_file:
-        '''Ev. lägg till errorhantering
-        för att se om .csv ser rätt ut genom att 
-        kolla på header-raden.
-        '''
+
         csv_reader = csv.reader(csv_file, delimiter = ',')
         first_line = next(csv_reader) # Skip header in file.
 
@@ -115,10 +140,17 @@ def csv_till_lista(filepath):
 
 
 def replace_values_qpcr(destinations, sources):
-    '''Creates a copy of the qPCR protocol blueprint and adds
-    source and destination wells for each
-    mastermix, standard and sample to the new copy.
-    '''
+    """
+    Creates a copy of the qPCR protocol blueprint and appends source and destination wells for each
+    mastermix, standard and sample to the new protocol.
+
+    Parameters:
+        destinations (str):         Dictionary containing destinations for mastermixes, samples and standards
+        sources (str):              Dictionary containing sources for mastermixes, sampls and standards
+
+    Returns:
+        Nothing.
+    """
     local_user = getlogin() # Used when specifiying filepaths
     all_wells = {**destinations, **sources} # Merge into 1 dicitonary for easy looping
     # Create a copy
