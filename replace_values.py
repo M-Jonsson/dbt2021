@@ -12,7 +12,7 @@
 #           Johan Lundberg 
 #      
 #   Version information:
-#           v1.1 2021-12-10: Refined after quality controls.
+#           v1.1 2021-12-XX: --
 #
 ####################################
 
