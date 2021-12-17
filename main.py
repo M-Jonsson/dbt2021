@@ -29,7 +29,7 @@ import replace_values_qpcr
 
 
 # Files and logins for SSH and SCP
-local_user = os.getlogin() # os.getlogin() get username on local machine
+local_user = os.getlogin() # os.getlogin() gives username on local machine
 key_filename = f'c:\\users\\{local_user}\\opentrons\\ot2_ssh_key'
 protocol_local_filepath = f'dna_cleaning\\'
 protocol_robot_filepath = '/data/user_storage/'
@@ -585,16 +585,16 @@ class Tube_rack_grid():
             Returns:
                 Nothing.
         """
-        # Creates a frame assigned to the specified parent widget
+        # Creates a frame assigned to the specified parent widget.
         self.parent = parent
         self.frame = tk.Frame(parent)
         self.frame.grid()
 
-        # Headers
+        # Headers on the grid.
         self.header_letters = ['A', 'B', 'C', 'D']
         self.header_numbers = [str(i) for i in range(1, 7)]
 
-        # Place headers on grid, letters on left-most column and numbers on upper-most row
+        # Place headers on grid, letters on left-most column and numbers on upper-most row.
         for i, row_letter in enumerate(self.header_letters):
             ttk.Label(self.frame, text=row_letter, foreground='grey').grid(row=i+1, column=0, padx=20, pady=20)
         for i, col_num in enumerate(self.header_numbers):
@@ -905,7 +905,7 @@ class Checkbox:
         time_process = multiprocessing.Process(target=self.scp_transfer(self.protocol), name="SCP transfer")
         time_process.start()
         time_process.join(5)
-        # If the upload takes longer than 5 seconds the program throws an error as it should not take that long. 
+        # Throws an error if the upload takes more than 5 seconds as it should happen almost instantly. 
         if time_process.is_alive():
             time_process.terminate()
             messagebox.showerror('Transfer Error!','An error occured during the transfer of the protocol file to the robot.')
@@ -914,17 +914,13 @@ class Checkbox:
             except ValueError:
                 print('Time process still running')
         else:
-            # If the upload of the protocol file is successful, powershell tries to run to connect to the robot.
-            # Launch the new protocol using
-            # ssh -i <key> <login> -t "sh -lic" <command>
-            # -t creates a pseudo terminal on the remote machine (?)
-            # sh -lic makes the following command (c) (opentrons_execute <file>) run in an interactive (i) and login (l) shell.
-            # This is required to initialize everything correctly, else cannot use magnetic module or find calibration data. 
+            # Successful upload with scp so continue to execution. 
             try:
                 log = self.execute_run()
             except ProcessError:
                 print('There was an error starting the run.')
 
+            # The protocol has "print('Protocol Complete')" as a final step.
             if 'Protocol Complete' in log:
                 # self.run_complete(True)
                 messagebox.showinfo('Run Completed', 'Protocol was completed successfully!', parent=self.parent)
@@ -932,12 +928,10 @@ class Checkbox:
                 # self.run_complete(False)
                 messagebox.showwarning('Run Failed!', 'Protocol was canceled before completing,\neither due to an error or it was canceled by the user.', parent=self.parent)
     
-    # Small function to enable multiprocessing later - used only for error-checking.
     def scp_transfer(self, protocol):
         """
-        Function required for the multiprocessing process that uploads the protocol to the robot used in the 
-
-        run_protocol() function.
+        Uploads a protocol using scp.
+        Done as a separate function to enable checking for errors.
 
             Parameters:
                 self:                   Allows the function to access class attributes and methods
@@ -1004,7 +998,7 @@ class Checkbox:
             self.ip = ip1
   
     def create_printable_file(self, sources: dict, destinations: dict, filepath_csv: str):
-        '''Creates a .txt file showing the volume needed for each
+        """Creates a .txt file showing the volume needed for each
         mastermix, sample and stadard, as well as how to place it
         on the tube racks/cooling blocks.
         Saves the file in the same directory as the .csv it is based on.
@@ -1016,7 +1010,7 @@ class Checkbox:
 
             Returns:
                 Nothing.
-        '''
+        """
         filepath_base = filepath_csv.split('/')[:-1]
         original_file = filepath_csv.split('/')[-1].split('.')[0]
         new_file = f'qpcr_robot_layout_{original_file}.txt'
@@ -1050,22 +1044,26 @@ class Checkbox:
      
 class Threaded_ssh_check(multiprocessing.Process):
     """
-    Description
+    Subclass of multiprocessing.Process. When the process is started,
+    a socket connection is attempted to the provided IP.
+    The result of the connection attempt is communicated back by
+    putting it into the provided queue. 
 
         Attributes:
-            --
+            queue:                  The queue used to communicate between this process and the main UI.
+            ip (str):               The ip address to attempt to connect to.         
         
         Methods:
-            --
+            run:                    Creates a socket connection to the provided ip.        
     """
     def __init__(self, queue, ip):
         """
-        Description
+        Inherits the __init__() from multiprocessing.Process.
 
             Parameters:
                 self:               Allows the function to access class attributes and methods
-                queue ():
-                ip (str):
+                queue (Queue):      The multiprocessing.Queue used to communicate between the process and main UI.
+                ip (str):           THe ip address to attempt to connect to. 
             
             Returns:
                 Nothing.
@@ -1076,7 +1074,9 @@ class Threaded_ssh_check(multiprocessing.Process):
     
     def run(self):
         """
-        Description
+        Creates a socket connection to the provided ip and returns
+        the result by putting it back inte the provided queue.
+        Automatically called by using the start() function on the object.
 
             Parameters:
                 self:               Allows the function to access class attributes and methods
@@ -1122,15 +1122,8 @@ def run_gui():
     else:
         messagebox.showerror('File not found error!', f'SSH Key could not be found.\n\nA new key can be created following the instructions on the Opentrons website.\nIf a new key has been created,\nplease make sure that the key is placed in: {key_filename}')
         
-
     root.mainloop()
 
-# # Small function to enable multiprocessing later - used only for error-checking.
-# def scp_transfer(protocol):
-#     subprocess.run(f'scp -i {key_filename} {protocol[0]}{protocol[1]} {username}@{ip}:{protocol_robot_filepath}{protocol[1]}')
-#     return  
-
-# Main if-statement that runs the program.
 if __name__ == '__main__':
     # Runs the main program.
     run_gui()
