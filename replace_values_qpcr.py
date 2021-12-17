@@ -22,7 +22,7 @@ from os import getlogin
 """
                         --IMPORTANT NOTICE--
 
-These functions are designed to work with csv-files with a specific layout. 
+These functions are designed to work with csv-files with a specific layout. Check with owner of the robot before usage.
 """
 
 def csv_till_lista(filepath):
