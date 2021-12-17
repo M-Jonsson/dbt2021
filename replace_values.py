@@ -12,7 +12,7 @@
 #           Johan Lundberg 
 #      
 #   Version information:
-#           v1.1 2021-12-XX: --
+#           v1.1 2021-12-17: Added documentation
 #
 ####################################
 
