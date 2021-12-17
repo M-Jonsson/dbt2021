@@ -1,4 +1,21 @@
 # -*- coding: utf-8 -*-
+
+####################################
+#   Function used to create the protocol for DNA purification using SPRI-beads.
+#
+#   Authors: Group 5 Design-Build-Test 2021:
+#           Elsa Renström    
+#           Agata Jasna
+#           Tiam Fitoon
+#           Mathias Jonsson
+#           Johan Lehto
+#           Johan Lundberg 
+#      
+#   Version information:
+#           v1.1 2021-12-10: Refined after quality controls.
+#
+####################################
+
 import os
 from shutil import copyfile
 
