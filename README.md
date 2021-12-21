@@ -16,4 +16,4 @@ The general workflow when using the program is as follows:
 10.	Once ready, press “Run protocol” to start the robot. The robot will output information about each step it is doing in the terminal window that also opens when starting the program. The robot can be paused by opening the front door.
 11.	When the protocol is finished, closed the program by pressing the “Exit” button. Once the program has closed, the robot can be shut off using the power switch and the USB cable can be unplugged.
 ## Detailed instructions
-For more details, see [the accompanying manual](ot2_protocol_selector_manual.pdf). The manual contains 
+For more details, see [the accompanying manual](ot2_protocol_selector_manual.pdf). The manual additionally contains instructions on how to use the official Opentrons app for procedures where that is necessary, such as changing pipettes and calibrating the robot. It also contains troubleshooting instructions and a description of the general structure of the code meant for advanced users that want to make modifications to the program. 
