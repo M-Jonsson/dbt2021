@@ -217,7 +217,7 @@ class Bead_protocol_config():
         EB=float(self.entry_eb.get()) 
         etoh=self.ethanol_var.get()
 
-        if sample_no < 8:
+        if sample_no <= 8:
             self.image_path = 'Deck Images\\deck_less_8.gif'
         else:
             self.image_path = 'Deck Images\\deck_96.gif'
@@ -705,7 +705,7 @@ class Checkbox:
 
             self.print_file_button.grid(row=22, column=1, padx=20, pady=10, ipadx=10, ipady=3)
 
-        elif self.protocol_type.startswith('dna') and num_samples >= 8: # 8-96 DNA cleaning
+        elif self.protocol_type.startswith('dna') and num_samples > 8: # 9-96 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
@@ -726,7 +726,7 @@ class Checkbox:
             self.image_frame.grid(row=0, column=1)
             # self.add_image(self.image_frame, self.image_name)
 
-        elif self.protocol_type.startswith('dna') and num_samples < 8: # 1-7 DNA cleaning
+        elif self.protocol_type.startswith('dna') and num_samples <= 8: # 1-8 DNA cleaning
             columns=math.ceil(num_samples/8)
             beads=sample_vol*ratio*columns+60
             vol_eb=EB*columns+60
@@ -887,7 +887,7 @@ class Checkbox:
     def run_protocol(self):
         """
         Uploads the new protocol using: scp -i <key> <file_to_upload> <where_to_place_it>
-        Then launches the new protocol using: ssh -i <key> <login> -t "sh -lic" <command> -t
+        Then launches the new protocol using: ssh -i <key> <login> -t "sh -lic" <command>
         The sh -lic makes the following command (c) run in an interactive (i) and login (l) shell,
         which is required to initialize everything correctly. Else the robot cannot use 
         any labware or find calibration data. 
