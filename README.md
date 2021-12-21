@@ -1,39 +1,19 @@
 # DBT2021 - Pipette robot automation
-## Git/Github setup:
-Based on instructions from https://towardsdatascience.com/simple-github-integration-with-vscode-3d7a3db33047 with some additions and modifications. 
-### Install all requirements
-1. Create an account on GitHub.
-2. Install Git from https://git-scm.com/
-3. Install GitHub extension for VSCode https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github
-
-### Create local repo
-1. Open new window in VSCode (no file or folder selected).
-2. Select Clone Git Repository and enter url https://github.com/M-Jonsson/dbt2021.git 
-3. Select a folder to locally store the files.
-
-### Update user credentials
-1. In VSCode, open a terminal (terminal -> new terminal in the toolbar on top).
-2. In the terminal window, select Terminal
-3. Open a Git Bash terminal by pressing the small arrow to the right of the plus button (Launch profile...) and select Git Bash.
-4. In the Git Bash terminal enter:
-```
-git config user.name <your GitHub username>
-git config user.email <the email address of your GitHub account>
-```
-
-## Using GitHub with VSCode
-For larger changes, create a fork/branch from the main repo. (Comprabale to making a copy of all files and making edits to those [create a branch], then deleting the old files after everything works [merging to main with a pull request]).
-For smaller changes, the changes can be direclty commited.
-### Large changes - creating a fork/branch
-1. Press the branch button in the lower left corner (should be on the main branch by default). 
-2. Select "create a new branch..." and enter a name.
-3. Edit files.
-4. Commit changes to the new branch (see next section).
-5. When done, create a pull request to merge the current branch into the main branch 
-### Commiting changes
-A modified file will have a "M" symbol to show that the edits are only done on the local files. They must be commited to edit the file on the GitHub. The same applies to deleted or new files, but with different symbols. 
-1. Select source control on the left panel.
-2. The relevant file can be opened to compare changes.
-3. If happy with the changes, select "stage changes" (plus symbol beside the file name). Staging is mid-step in updating the GitHub files in case several files have been edited locally but only some should be uploaded.
-4. When all files that should be uploaded have been staged, enter a messege to describe the changes and press the Commit button (check mark) at the top of the source control pane.
-5. Finally, sync changes to update the GitHub files with the commit. 
+The OT-2 Protocol Selector program allows for creating and running protocol on the Opentrons OT-2 robot. The program supports SPRI beads DNA cleaning protocols and qPCR preparation protocols, which are constructed based on parameters input by the user or by a .csv file provided by the user, respectively. 
+## General instructions
+The general workflow when using the program is as follows:
+1.	Turn on the robot using the power switch.
+2.	Wait for the light on the front of the robot to shine with a steady blue light before plugging in the USB cable to a computer. 
+3.	Start the OT-2 Protocol Selector program.
+4.	Select the type of protocol that you want to work with.
+  a.	For SPRI bead DNA cleaning: Enter the desired protocol parameters and press “Create robot protocol”.
+  b.	For qPCR preparation: Press “Choose a file” and select the .csv file to base the protocol on.
+5.	(Optional: Press “Estimate time” to simulate the protocol using an experimental function from the robot manufacturer to get a rough estimation on how long the robot will run for.)
+6.	Press “Next”. A new window will open showing instructions on the necessary steps needed to prepare the robot for running the protocol.
+7.	Check the connection to the robot by pressing the “Check connection” button. If the connection fails, try pressing the button a few more times, otherwise see the troubleshooting section for more information. 
+8.	Following the instructions and load the robot deck according to the picture. When running a qPCR protocol, also load each tube rack according to its own tab.
+9.	(Optional, for qPCR protocol only: Press “Print layout to file” to get a printable version of the tube rack layouts and the volumes needed. This will create a .txt file in the same folder as the provided .csv file, which then can be printed by the user if needed.)
+10.	Once ready, press “Run protocol” to start the robot. The robot will output information about each step it is doing in the terminal window that also opens when starting the program. The robot can be paused by opening the front door.
+11.	When the protocol is finished, closed the program by pressing the “Exit” button. Once the program has closed, the robot can be shut off using the power switch and the USB cable can be unplugged.
+## Detailed instructions
+For more details, see [the accompanying manual](ot2_protocol_selector_manual.pdf). The manual contains 
