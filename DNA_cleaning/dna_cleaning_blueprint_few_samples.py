@@ -10,7 +10,9 @@
 #           Johan Lundberg 
 #      
 #   Version information:
+#           v1.0 2021-11-05: First protocol version.
 #           v1.1 2021-12-10: Refined after quality controls.
+#           v1.2 2021-12-21: Ready for external use.
 #
 ####################################
 
@@ -150,7 +152,6 @@ class Pipette:
 
         
 
-
 ####################################
 #============RUN FUNCTION===========
 ####################################
@@ -158,8 +159,8 @@ class Pipette:
 def run(protocol: protocol_api.ProtocolContext):
     
     protocol.set_rail_lights(True)
-    print('DOOR STATE = ' + str(protocol.door_closed))
 
+    #Multithreded method to pause the protocol if the door of the OT-2 is opened. 
     global paused
     paused = False
     global done
@@ -210,7 +211,6 @@ def run(protocol: protocol_api.ProtocolContext):
     P10 = Pipette(protocol, p10, tiprack_11)
 
     
-    
     #########################
     ###START PROTOCOL########
     #########################
@@ -223,7 +223,6 @@ def run(protocol: protocol_api.ProtocolContext):
     custom_mix(p300, 30, 15, resevoir['A1'], 3, 6)
     p300.flow_rate.aspirate = 120
     p300.flow_rate.dispense = 30
-    #p300.transfer(vol_beads, resevoir['A1'], sample_plate['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
     p300.aspirate(vol_beads+10, resevoir['A1'].bottom(z=3))
     p300.dispense(vol_beads, sample_plate['A1'].bottom(z=5))
     p300.dispense(10, resevoir['A1'].bottom(z=20))
@@ -249,25 +248,21 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.aspirate(5, sample_plate['A1'].bottom(z=0.2))
     p300.aspirate(5, sample_plate['A1'].bottom(z=0.1))
     p300.aspirate(5, sample_plate['A1'].bottom(z=0))
-    #p300.aspirate(vol_samples+vol_beads, sample_plate['A1'])
     p300.drop_tip()
-    
     
     #Cleans the samples with EtOH.
     P300.pick_up()
     for i in range(1, cleanings + 1):
+        #Add ethanol
         p300.flow_rate.aspirate = 60
         p300.flow_rate.dispense = 30
         p300.aspirate(190, resevoir['A' + str(4 + i)].bottom(z=3), 3) 
         stepwise_dispense(p300, 190, sample_plate['A1'], 10)
         protocol.delay(seconds=30) #seconds=30
-        
-        #p300.transfer(200, sample_plate['A1'], resevoir_trash['A1'], blow_out=(True), blowout_location='destination well', new_tip='never')
-        
-        #remove EtOH
+
+        #Remove ethanol
         p300.flow_rate.aspirate=90
         p300.flow_rate.dispense=100
-        #p300.pick_up_tip(tiprack_7.wells('A' + str(i))[0])
         center_location = sample_plate['A1'].bottom(z=0.3)
         center_location_higher = center_location.move(Point(0, 0, 1.2))
         adjusted_location1 = center_location.move(Point(0.3, 0.3, 0.1))
@@ -280,20 +275,16 @@ def run(protocol: protocol_api.ProtocolContext):
 
         p300.dispense(220, resevoir_trash['A1'].bottom(z=3)) 
         p300.blow_out(resevoir_trash['A1'].bottom(z=10)) 
-         
     p300.drop_tip()
-    
     
     #Wait 5 min. Disengage magnet.
     protocol.delay(minutes=5) #minutes=5
     mag_deck.disengage()
 
-
     #Add EB and mix.
     P300.pick_up()
     p300.flow_rate.aspirate = 120
     p300.flow_rate.dispense = 120    
-    #p300.transfer(vol_EB, resevoir['A3'], sample_plate['A1'], new_tip ='never')
     p300.transfer(
         vol_EB,
         resevoir['A3'].bottom(z=3), 
@@ -304,12 +295,10 @@ def run(protocol: protocol_api.ProtocolContext):
     custom_mix(p300, 30, vol_EB-3, sample_plate['A1'], 0.4, 1.5)
     p300.drop_tip()
       
-    
     #Disengage magnet to release DNA. Wait 1 min.
     mag_deck.engage()
     protocol.delay(minutes=1) #minutes=1
  
-
     #Transfer the purified sample to a clean plate.
     p10.flow_rate.aspirate = 3
     p10.flow_rate.dispense = 10
@@ -318,6 +307,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p10.blow_out()
     p10.drop_tip()
     
+    #Some finnishing stuff.
     p10.home()
     mag_deck.disengage()
 

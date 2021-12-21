@@ -10,7 +10,9 @@
 #           Johan Lundberg 
 #      
 #   Version information:
+#           v1.0 2021-11-05: First protocol version.
 #           v1.1 2021-12-08: Refined after quality controls.
+#           v1.2 2021-12-21: Ready for external use.
 #
 ####################################
 
@@ -74,14 +76,12 @@ def stepwise_dispense(pipette, volume, location_dispense, steps):
             Nothing.
     """
     step_volume = volume/steps
-    #pipette.flow_rate.dispense=30
     for i in range(steps):
         volume_added = (i+1)*step_volume #total volume added efter the step is done
         #polyn. describing relationship between height and volume
         #applies only to 200ul 96-well PCR plate from bio rad
         dispense_height = (-2.5+((2.5**2)+4.9+1.42*volume_added)**(1/2)) + 1 #additional 1 mm above est. level
         pipette.dispense(step_volume, location_dispense.bottom(z=dispense_height))
-    #pipette.flow_rate.dispense = 300
 
 
 ####################################
@@ -92,6 +92,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     protocol.set_rail_lights(True)
 
+    #Multithreded method to pause the protocol if the door of the OT-2 is opened. 
     global paused
     paused = False
     global done
@@ -170,7 +171,6 @@ def run(protocol: protocol_api.ProtocolContext):
         custom_mix(p300, 15, vol_samples+volBeads-10, sample_plate['A' + str(i)], 0.6, 3) #prev -5 vol, 3mm disp. Ger några luftbubbl. som sedan försvinner.
         p300.drop_tip()
     
-    
     #Wait 5 min. Engage magnet. Wait 5 min.
     protocol.delay(minutes=5) # 5minutes
     mag_deck.engage() 
@@ -227,11 +227,9 @@ def run(protocol: protocol_api.ProtocolContext):
             elif j == cleanings:
                 p300.drop_tip()        
                    
-    
     #Wait 5 min. Disengage magnet.
     protocol.delay(minutes=5)  # 5minutes
     mag_deck.disengage()
-
 
     #Add EB and mix.
     for i in range(1,columns+1): 
@@ -252,7 +250,6 @@ def run(protocol: protocol_api.ProtocolContext):
     mag_deck.engage()
     protocol.delay(minutes=1)
  
-
     #Transfers the purified samples to a clean plate.
     p10.flow_rate.aspirate = 3
     p10.flow_rate.dispense = 10
@@ -266,6 +263,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p10.blow_out()
         p10.drop_tip()
     
+    #Some finnishing stuff.
     p300.home()
     mag_deck.disengage()
 

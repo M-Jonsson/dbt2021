@@ -10,7 +10,9 @@
 #           Johan Lundberg 
 #      
 #   Version information:
+#           v1.0 2021-11-XX: First protocol version.
 #           v1.1 2021-12-16: Added documentation.
+#           v1.2 2021-12-21: Ready for external use.
 #
 ####################################
 
@@ -69,7 +71,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     protocol.set_rail_lights(True)
     
-    # Pause on door open
+    #Multithreded method to pause the protocol if the door of the OT-2 is opened. 
     global paused
     paused = False
     global done
@@ -118,18 +120,17 @@ def run(protocol: protocol_api.ProtocolContext):
             p10.dispense(7, well_plate[well]) #Dispense more than aspirated to minimize liquid left in the pipette. 
         p10.drop_tip()
 
-
     for sample in sample_destination.keys():
         for well in sample_destination[sample]:
             tube_rack = tube_racks[sample_source[sample][0]]
             p10.transfer(4, tube_rack[sample_source[sample][1]], well_plate[well])
-
 
     for standard in standard_destination.keys():
         for well in standard_destination[standard]:
             tube_rack = tube_racks[standard_source[standard][0]]
             p10.transfer(4, tube_rack[standard_source[standard][1]], well_plate[well])
 
+    #Some finnishing stuff.
     done = True
     thread.join()
 
